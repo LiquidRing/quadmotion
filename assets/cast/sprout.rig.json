@@ -1,0 +1,235 @@
+{
+  "$schema": "../../schema/rig.schema.json",
+  "name": "sprout",
+  "description": "Sprout: an original little potted plant with a face on its terracotta pot. Sways, blooms a pink flower, perks up when watered. MIT, free to reuse.",
+  "canvas": {
+    "cols": 7,
+    "rows": 4
+  },
+  "palette": {
+    "T": { "name": "pot", "rgb": [196, 104, 64], "ansi16": 33 },
+    "R": { "name": "rim", "rgb": [140, 70, 44], "ansi16": 31 },
+    "E": { "name": "eye", "rgb": [44, 26, 22], "ansi16": 30 },
+    "G": { "name": "leaf", "rgb": [120, 206, 92], "ansi16": 92 },
+    "g": { "name": "stem", "rgb": [58, 140, 64], "ansi16": 32 },
+    "F": { "name": "petal", "rgb": [255, 138, 190], "ansi16": 95 },
+    "Y": { "name": "pollen", "rgb": [255, 220, 84], "ansi16": 93 },
+    "W": { "name": "water", "rgb": [120, 190, 255], "ansi16": 94 }
+  },
+  "poses": {
+    "rest": {
+      "pixels": [
+        "..............",
+        "GGG...gg...GGG",
+        ".GGGG.gg.GGGG.",
+        "...GGGggGGG...",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "blink": {
+      "pose": "rest",
+      "remap": {
+        "E": "T"
+      }
+    },
+    "sway_l": {
+      "pixels": [
+        "...........GG.",
+        "G....gg...GGG.",
+        "GGGG..gg.GGG..",
+        ".GGGG.ggGG....",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "sway_r": {
+      "pixels": [
+        ".GG...........",
+        ".GGG...gg....G",
+        "..GGG.gg..GGGG",
+        "....GGgg.GGGG.",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "perk": {
+      "pixels": [
+        "GG..........GG",
+        ".GG...gg...GG.",
+        "..GGG.gg.GGG..",
+        "...GGGggGGG...",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "perk_blink": {
+      "pose": "perk",
+      "remap": {
+        "E": "T"
+      }
+    },
+    "bud_1": {
+      "pixels": [
+        "......gg......",
+        "GGG...gg...GGG",
+        ".GGGG.gg.GGGG.",
+        "...GGGggGGG...",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "bud_2": {
+      "pixels": [
+        "......FF......",
+        "GGG...gg...GGG",
+        ".GGGG.gg.GGGG.",
+        "...GGGggGGG...",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "bud_3": {
+      "pixels": [
+        ".....FFFF.....",
+        "GGG...gg...GGG",
+        ".GGGG.gg.GGGG.",
+        "...GGGggGGG...",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "bud_4": {
+      "pixels": [
+        ".....FFFF.....",
+        "GGG..FggF..GGG",
+        ".GGGG.gg.GGGG.",
+        "...GGGggGGG...",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "bloom_open": {
+      "pixels": [
+        "GG..F.YY.F..GG",
+        ".GG..FYYF..GG.",
+        "..GGG.gg.GGG..",
+        "...GGGggGGG...",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "bloom": {
+      "pixels": [
+        "GG..FFYYFF..GG",
+        ".GG..FYYF..GG.",
+        "..GGG.gg.GGG..",
+        "...GGGggGGG...",
+        "..RRRRRRRRRR..",
+        "..TTTTTTTTTT..",
+        "...TTETTETT...",
+        "....TTTTTT...."
+      ]
+    },
+    "bloom_blink": {
+      "pose": "bloom",
+      "remap": {
+        "E": "T"
+      }
+    }
+  },
+  "timelines": {
+    "sway": {
+      "tickMs": 120,
+      "loop": true,
+      "frames": [
+        { "pose": "rest", "hold": 6 },
+        { "pose": "sway_l", "hold": 7 },
+        { "pose": "rest", "hold": 3 },
+        { "pose": "sway_r", "hold": 7 },
+        { "pose": "rest", "hold": 4 },
+        { "pose": "blink", "hold": 1 },
+        { "pose": "rest", "hold": 4 },
+        { "pose": "sway_l", "hold": 6 },
+        { "pose": "rest", "hold": 3 },
+        { "pose": "sway_r", "hold": 6 },
+        { "pose": "rest", "hold": 3 }
+      ]
+    },
+    "bloom": {
+      "tickMs": 100,
+      "loop": false,
+      "frames": [
+        { "pose": "rest", "hold": 6 },
+        { "pose": "bud_1", "hold": 6 },
+        { "pose": "bud_2", "hold": 6 },
+        { "pose": "bud_3", "hold": 5 },
+        { "pose": "bud_4", "hold": 8 },
+        { "pose": "bloom_open", "hold": 3 },
+        { "pose": "bloom", "hold": 8 },
+        { "pose": "bloom_blink", "hold": 2 },
+        { "pose": "bloom", "hold": 3 },
+        { "pose": "bloom_blink", "hold": 2 },
+        { "pose": "bloom", "hold": 10 }
+      ]
+    },
+    "water": {
+      "tickMs": 100,
+      "loop": true,
+      "frames": [
+        { "pose": "rest", "hold": 10 },
+        {
+          "pose": "rest",
+          "hold": 2,
+          "overlays": [
+            {
+              "text": "'",
+              "col": 2,
+              "row": 0,
+              "fg": "W"
+            },
+            {
+              "text": "'",
+              "col": 4,
+              "row": 0,
+              "fg": "W"
+            }
+          ]
+        },
+        { "pose": "blink", "hold": 2 },
+        { "pose": "perk", "hold": 8 },
+        { "pose": "perk_blink", "hold": 2 },
+        { "pose": "perk", "hold": 6 },
+        { "pose": "rest", "hold": 8 },
+        { "pose": "blink", "hold": 2 },
+        { "pose": "rest", "hold": 6 }
+      ]
+    }
+  },
+  "defaultTimeline": "sway",
+  "reducedMotionPose": "rest",
+  "events": {
+    "session.start": "bloom",
+    "idle": "sway",
+    "tool.call": "water",
+    "turn.complete": "bloom"
+  }
+}

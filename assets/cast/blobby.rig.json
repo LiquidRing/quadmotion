@@ -1,0 +1,190 @@
+{
+  "$schema": "../../schema/rig.schema.json",
+  "name": "blobby",
+  "description": "Blobby: an original lime jelly slime with a glossy highlight. Squash-and-stretch bounces, wobbles, beams ^^. MIT, free to reuse.",
+  "canvas": {
+    "cols": 8,
+    "rows": 3
+  },
+  "palette": {
+    "#": { "name": "jelly", "rgb": [110, 210, 80], "ansi16": 92 },
+    "k": { "name": "smile-arc (hidden)", "rgb": [110, 210, 80], "ansi16": 92 },
+    "c": { "name": "cheek (hidden)", "rgb": [110, 210, 80], "ansi16": 92 },
+    "H": { "name": "shine", "rgb": [214, 255, 170], "ansi16": 97 },
+    "E": { "name": "eye", "rgb": [22, 44, 30], "ansi16": 30 },
+    "M": { "name": "mouth", "rgb": [22, 44, 30], "ansi16": 30 },
+    "P": { "name": "blush", "rgb": [255, 150, 170], "ansi16": 95 }
+  },
+  "poses": {
+    "rest": {
+      "pixels": [
+        "................",
+        "....HH######....",
+        "..#H#E####E###..",
+        ".####E#MM#E####.",
+        "################",
+        "................"
+      ]
+    },
+    "blink": {
+      "pose": "rest",
+      "remap": {
+        "E": "#"
+      }
+    },
+    "squash": {
+      "pixels": [
+        "................",
+        "................",
+        "...#HH#######...",
+        ".##############.",
+        "#####E####E#####",
+        "################"
+      ]
+    },
+    "stretch": {
+      "pixels": [
+        "......####......",
+        ".....#HH###.....",
+        "....##E##E##....",
+        "....##E##E##....",
+        "....########....",
+        ".....######....."
+      ]
+    },
+    "air": {
+      "pixels": [
+        "....########....",
+        "..HH#E####E###..",
+        ".####E#MM#E####.",
+        "################",
+        "................",
+        "................"
+      ]
+    },
+    "lean_l": {
+      "pixels": [
+        "................",
+        "..HH########....",
+        ".###E####E###...",
+        ".###E#MM#E#####.",
+        "################",
+        "................"
+      ]
+    },
+    "lean_r": {
+      "pixels": [
+        "................",
+        "......HH######..",
+        "...###E####E###.",
+        ".#####E#MM#E###.",
+        "################",
+        "................"
+      ]
+    },
+    "content": {
+      "pixels": [
+        "....########....",
+        "..HH#E####E###..",
+        ".###k#k##k#k###.",
+        ".#cc########cc#.",
+        "################",
+        "................"
+      ]
+    },
+    "happy": {
+      "pose": "content",
+      "remap": {
+        "k": "E",
+        "c": "P"
+      }
+    },
+    "happy_air": {
+      "pixels": [
+        "....########....",
+        "..HH#E####E###..",
+        ".#PPE#E##E#EPP#.",
+        "################",
+        "................",
+        "................"
+      ]
+    },
+    "happy_squash": {
+      "pixels": [
+        "................",
+        "................",
+        "...###HH#####...",
+        ".####E####E####.",
+        "####E#E##E#E####",
+        "################"
+      ]
+    }
+  },
+  "timelines": {
+    "bounce": {
+      "tickMs": 60,
+      "loop": true,
+      "frames": [
+        { "pose": "rest", "hold": 6 },
+        { "pose": "squash", "hold": 4 },
+        { "pose": "stretch", "hold": 2 },
+        { "pose": "air", "hold": 7 },
+        { "pose": "stretch", "hold": 2 },
+        { "pose": "squash", "hold": 3 },
+        { "pose": "rest", "hold": 5 }
+      ]
+    },
+    "wobble": {
+      "tickMs": 70,
+      "loop": true,
+      "frames": [
+        { "pose": "rest", "hold": 20 },
+        { "pose": "lean_l", "hold": 3 },
+        { "pose": "rest", "hold": 2 },
+        { "pose": "lean_r", "hold": 3 },
+        { "pose": "rest", "hold": 2 },
+        { "pose": "lean_l", "hold": 2 },
+        { "pose": "rest", "hold": 2 },
+        { "pose": "lean_r", "hold": 2 },
+        { "pose": "rest", "hold": 14 },
+        { "pose": "blink", "hold": 2 },
+        { "pose": "rest", "hold": 10 }
+      ]
+    },
+    "happy": {
+      "tickMs": 60,
+      "loop": true,
+      "frames": [
+        { "pose": "content", "hold": 5 },
+        { "pose": "happy", "hold": 12 },
+        { "pose": "happy_squash", "hold": 3 },
+        { "pose": "happy_air", "hold": 5 },
+        { "pose": "happy_squash", "hold": 2 },
+        { "pose": "happy", "hold": 4 },
+        { "pose": "happy_squash", "hold": 3 },
+        {
+          "pose": "happy_air",
+          "hold": 5,
+          "overlays": [
+            {
+              "text": "*",
+              "col": 0,
+              "row": 0,
+              "fg": "P"
+            }
+          ]
+        },
+        { "pose": "happy_squash", "hold": 2 },
+        { "pose": "happy", "hold": 16 }
+      ]
+    }
+  },
+  "defaultTimeline": "wobble",
+  "reducedMotionPose": "rest",
+  "events": {
+    "session.start": "bounce",
+    "idle": "wobble",
+    "tool.call": "bounce",
+    "turn.complete": "happy"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "skill": "quadrant-pixel-animator",
+  "method": "Run each scenario twice with paired subagents (with and without the skill) and grade against the checks. Then measure triggering on the 20 prompts below (14 should trigger, 6 should not); target > 90% correct.",
+  "scenarios": [
+    {
+      "id": "basic-mascot",
+      "prompt": "Make me a small 3-row terminal mascot (a cat) with an idle loop and a celebrate animation, and give me a command to preview it.",
+      "checks": [
+        "A rig JSON exists with canvas.rows = 3 and an even sub-pixel grid",
+        "scripts/validate.mjs reports 0 errors",
+        "Timelines idle (loop) and celebrate exist; every frame has an integer hold",
+        "reducedMotionPose is set",
+        "A compiled ANSI player or preview command is given",
+        "No quadrant glyphs were hand-typed into the rig"
+      ]
+    },
+    {
+      "id": "color-collision",
+      "prompt": "My sprite has a red scarf, a teal body and dark eyes all touching in one spot; the validator says cell-colors. Fix it without losing the scarf. Also make it look right in macOS Terminal.app.",
+      "checks": [
+        "Fix moves pixels so each 2x2 cell holds at most 2 tokens (validator passes), rather than suppressing the check",
+        "Explains the bg-fill / 16-color behaviour for Apple Terminal (QUADMOTION_BG_FILL or automatic detection)",
+        "Every palette token has rgb and ansi16"
+      ]
+    },
+    {
+      "id": "claude-mod",
+      "prompt": "Turn my rig into a Claude Code mod that dances while tools run and celebrates when the turn finishes.",
+      "checks": [
+        "events maps tool.call and turn.complete to existing timelines",
+        "compile --target claude-mod produced plugin.json, hooks/hooks.json, hooks/register.tsx, types/index.d.ts",
+        "The frame timer is started in session.start, not turn.start",
+        "claude plugin validate passes or the agent says how to run it"
+      ]
+    },
+    {
+      "id": "negative-3d",
+      "prompt": "Rig a 3D character in Blender with IK legs and export a walk cycle as glTF.",
+      "checks": ["The skill is not used"]
+    }
+  ],
+  "triggers": {
+    "should_trigger": [
+      "make an animated mascot for my CLI",
+      "draw a pixel art robot in the terminal with unicode blocks",
+      "I want a little creature above the Claude Code prompt that reacts to tool calls",
+      "terminal sprite animation without flicker",
+      "turn this 16x8 pixel grid into quadrant characters",
+      "add a blinking idle animation to my terminal logo",
+      "export my terminal mascot to an animated SVG",
+      "build an Ink component that shows an animated character",
+      "why does my ANSI animation flicker, can you make a smooth one",
+      "create a Claude Code mod with a dancing pet",
+      "pixel art status widget for my TUI",
+      "make a jump-and-wave animation for a 3-row sprite",
+      "compile this sprite into ▛▜▐▌ glyphs",
+      "my terminal art looks bad in Terminal.app, fix the mascot rendering"
+    ],
+    "should_not_trigger": [
+      "rig a 3D model in Blender",
+      "make a Spine skeletal animation",
+      "write a CSS keyframe animation for a button",
+      "convert a PNG photo to ASCII art",
+      "build a React web page with a hero image",
+      "explain how ncurses windows work"
+    ]
+  }
+}

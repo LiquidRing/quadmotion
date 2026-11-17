@@ -1,0 +1,626 @@
+<title>QuadMotion Showcase</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Martian+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a single dark "terminal room" — hero stage, a working player with an
+   inspector rail, a cast wall, then the pipeline. Committed single dark look. */
+:root {
+  --ink: #0e1016;
+  --panel: #161925;
+  --panel-2: #1c2030;
+  --line: #2a3045;
+  --text: #e7e9f3;
+  --muted: #8c93ad;
+  --teal: #40c0a8;
+  --bulb: #facc48;
+  --rose: #ff6f8a;
+  --font-display: "Martian Mono", "JetBrains Mono", ui-monospace, monospace;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-term: "JetBrains Mono", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--text);
+  font: 15px/1.6 var(--font-body);
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: var(--teal); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: clamp(20px, 2.6vw, 28px); }
+h3 { font-size: 15px; }
+.eyebrow { font: 600 11px/1 var(--font-term); text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+p { margin: 0; max-width: 68ch; }
+code, kbd, .mono { font-family: var(--font-term); font-size: 0.92em; }
+:focus-visible { outline: 2px solid var(--bulb); outline-offset: 2px; }
+
+/* Hero */
+.hero { padding-block: 40px 28px; display: grid; gap: 22px; }
+.hero-stage { background: #07080c; border: 1px solid var(--line); border-radius: 10px; padding: 18px; overflow: hidden; }
+.hero-stage canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.hero-copy { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: end; }
+.hero-copy h1 { font-size: clamp(26px, 4.4vw, 46px); line-height: 1.05; }
+.hero-copy h1 span { color: var(--bulb); }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.fact { font: 500 12px/1 var(--font-term); padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--text); background: var(--panel); white-space: nowrap; }
+.fact b { color: var(--teal); font-weight: 600; }
+@media (max-width: 760px) { .hero-copy { grid-template-columns: 1fr; } .facts { justify-content: flex-start; } }
+
+/* Player */
+section { padding-block: 34px; border-top: 1px solid var(--line); display: grid; gap: 18px; }
+.section-head { display: grid; gap: 8px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { font: 500 13px/1 var(--font-term); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; cursor: pointer; }
+.tab[aria-selected="true"] { color: var(--ink); background: var(--teal); border-color: var(--teal); }
+.tab:hover { color: var(--text); }
+.tab[aria-selected="true"]:hover { color: var(--ink); }
+.player { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .player { grid-template-columns: 1fr; } }
+.term { background: #07080c; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; }
+.term-bar { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--line); font: 12px/1.3 var(--font-term); color: var(--muted); background: var(--panel); }
+.term-body { padding: 16px; overflow-x: auto; }
+.term-body canvas { display: block; margin: 0 auto; cursor: crosshair; image-rendering: pixelated; }
+.term-text { margin: 0 auto; width: max-content; font: 18px/1 var(--font-term); white-space: pre; letter-spacing: 0; }
+.desc { padding: 10px 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--panel); }
+.btn { font: 600 12px/1 var(--font-term); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.ctl { display: inline-flex; align-items: center; gap: 6px; font: 12px/1 var(--font-term); color: var(--muted); }
+select, input[type="range"] { accent-color: var(--teal); }
+select { font: 12px var(--font-term); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 12px/1 var(--font-term); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--bulb); color: var(--bulb); }
+
+/* Inspector rail */
+.rail { display: grid; gap: 12px; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font: 12.5px/1.35 var(--font-term); }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.zoom { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: center; }
+.zoom canvas { width: 96px; height: 96px; border: 1px solid var(--line); border-radius: 6px; background: #07080c; }
+.glyph-big { font: 44px/1 var(--font-term); text-align: center; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; border: 1px solid #ffffff22; }
+.bytes-bar { height: 8px; border-radius: 4px; background: var(--panel-2); overflow: hidden; }
+.bytes-bar i { display: block; height: 100%; background: var(--teal); transition: width 120ms linear; }
+.hint { color: var(--muted); font-size: 12.5px; }
+
+/* Cast wall */
+.cast { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.actor { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+.actor .stage { background: #07080c; display: grid; place-items: center; padding: 18px; min-height: 150px; border-bottom: 1px solid var(--line); }
+.actor .stage canvas { image-rendering: pixelated; max-width: 100%; }
+.actor .meta { padding: 12px 14px; display: grid; gap: 8px; align-content: start; }
+.actor .meta p { color: var(--muted); font-size: 13px; }
+
+/* Pipeline */
+.pipe { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .pipe { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .pipe { grid-template-columns: 1fr; } }
+.step { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 8px; align-content: start; }
+.step .n { font: 700 12px/1 var(--font-display); color: var(--bulb); }
+.step p { color: var(--muted); font-size: 13.5px; }
+pre.cmd { margin: 0; background: #07080c; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 13px/1.6 var(--font-term); color: var(--text); }
+pre.cmd span { color: var(--muted); }
+footer { padding-block: 26px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { .bytes-bar i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-stage"><canvas id="hero" aria-label="QuadMotion title animation, rendered from quadrant glyph cells"></canvas></div>
+    <div class="hero-copy">
+      <div style="display:grid;gap:10px">
+        <span class="eyebrow">terminal pixel-art engine</span>
+        <h1>Four pixels per cell.<br><span>Zero flicker.</span></h1>
+        <p>QuadMotion compiles pixel grids into Unicode quadrant glyphs <span class="mono">▘▝▀▖▌▞▛▗▚▐▜▄▙▟█</span>, solves the two-colors-per-cell limit, and plays hold-timed animation in a fixed-height box with diffed, DEC&nbsp;2026-synchronized frames. Everything below is drawn from the engine's real compiled cells.</p>
+      </div>
+      <div class="facts" id="facts"></div>
+    </div>
+  </header>
+
+  <section aria-labelledby="player-h">
+    <div class="section-head">
+      <span class="eyebrow">player</span>
+      <h2 id="player-h">Scenes</h2>
+      <p class="hint">In pixel render, hover or tap a cell to inspect its 2×2 sub-pixels, mask and colors. Switch the color mode to see how the same frame degrades on 16-color terminals and Apple Terminal.</p>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="player">
+      <div class="term">
+        <div class="term-bar"><span id="term-title">quadmotion preview</span><span id="term-size"></span></div>
+        <div class="term-body" id="term-body"><canvas id="stage"></canvas><pre class="term-text" id="term-text" hidden></pre></div>
+        <div class="desc" id="desc"></div>
+        <div class="controls">
+          <button class="btn" id="play" type="button">Pause</button>
+          <button class="btn" id="step" type="button" title="Next frame">Step ▸</button>
+          <label class="ctl" for="speed">speed <input id="speed" type="range" min="0.25" max="2" step="0.25" value="1"><span id="speed-v" class="mono">1×</span></label>
+          <label class="ctl" for="mode">colors
+            <select id="mode">
+              <option value="truecolor">24-bit</option>
+              <option value="ansi16">16-color</option>
+              <option value="apple">Apple Terminal (bg-fill)</option>
+              <option value="mono">NO_COLOR</option>
+            </select>
+          </label>
+          <label class="ctl" for="render">render
+            <select id="render">
+              <option value="pixels">pixels</option>
+              <option value="glyphs">real glyphs</option>
+            </select>
+          </label>
+          <label class="ctl" for="grid"><input id="grid" type="checkbox"> cell grid</label>
+          <button class="btn" id="copy" type="button">Copy frame as printf</button>
+        </div>
+        <div class="controls" id="timelines-row"><span class="ctl">timeline</span><div class="chips" id="timelines"></div></div>
+      </div>
+      <aside class="rail">
+        <div class="card">
+          <span class="eyebrow">frame</span>
+          <dl class="kv">
+            <dt>frame</dt><dd id="s-frame">–</dd>
+            <dt>hold</dt><dd id="s-hold">–</dd>
+            <dt>canvas</dt><dd id="s-canvas">–</dd>
+            <dt>full redraw</dt><dd id="s-full">–</dd>
+            <dt>diff update</dt><dd id="s-diff">–</dd>
+          </dl>
+          <div class="bytes-bar" aria-hidden="true"><i id="s-bar" style="width:0%"></i></div>
+          <span class="hint" id="s-note">Approximate bytes sent for this frame: run-length SGR, only changed rows rewritten, cursor moves and the DEC 2026 wrapper estimated.</span>
+        </div>
+        <div class="card">
+          <span class="eyebrow">cell inspector</span>
+          <div class="zoom">
+            <canvas id="zoom" width="96" height="96"></canvas>
+            <div class="glyph-big" id="i-glyph">▛</div>
+          </div>
+          <dl class="kv">
+            <dt>cell</dt><dd id="i-cell">–</dd>
+            <dt>mask BR BL TR TL</dt><dd id="i-mask">–</dd>
+            <dt>code point</dt><dd id="i-cp">–</dd>
+            <dt>fg</dt><dd id="i-fg">–</dd>
+            <dt>bg</dt><dd id="i-bg">–</dd>
+          </dl>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section aria-labelledby="cast-h">
+    <div class="section-head">
+      <span class="eyebrow">rigs</span>
+      <h2 id="cast-h">The cast</h2>
+      <p class="hint">Hand-drawn JSON rigs: pixel rows at 2× resolution, a palette, and hold timelines. Tap a timeline to play it.</p>
+    </div>
+    <div class="cast" id="cast"></div>
+  </section>
+
+  <section aria-labelledby="how-h">
+    <div class="section-head">
+      <span class="eyebrow">pipeline</span>
+      <h2 id="how-h">How a frame is made</h2>
+    </div>
+    <div class="pipe">
+      <div class="step"><span class="n">grid</span><h3>Draw at 2× resolution</h3><p>One character per sub-pixel; a terminal cell holds 2×2. Rigs are JSON, scenes are code on a sub-pixel canvas.</p></div>
+      <div class="step"><span class="n">solve</span><h3>Two colors per cell</h3><p>Transparent stays background; the majority color becomes foreground, so a body cell with one eye pixel compiles to ▛, not an inverted ▗. A third color folds to the nearest.</p></div>
+      <div class="step"><span class="n">encode</span><h3>16 masks → glyphs</h3><p>Bits TL=1, TR=2, BL=4, BR=8 pick one of 16 quadrant glyphs. Neighbouring cells with equal colors share one SGR run.</p></div>
+      <div class="step"><span class="n">play</span><h3>Diff + DEC 2026</h3><p>Fixed height, only changed rows rewritten, the frame wrapped in <code>ESC[?2026h … l</code> so the terminal applies it at once.</p></div>
+    </div>
+    <pre class="cmd"><span># validate, preview, compile a rig</span>
+node src/cli.mjs validate --input assets/pip.rig.json
+node src/cli.mjs preview  --input assets/pip.rig.json --timeline jump_wave
+node src/cli.mjs compile  --input assets/pip.rig.json --target ansi,ink,claude-mod,svg
+<span># the whole show in your terminal</span>
+node src/cli.mjs demo</pre>
+  </section>
+
+  <footer>QuadMotion · MIT · every frame on this page comes from the engine's compiled cells (<span id="foot-count"></span>).</footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+
+// ---------- palette / color modes ----------
+const XTERM = {30:[0,0,0],31:[205,49,49],32:[13,188,121],33:[229,229,16],34:[36,114,200],35:[188,63,188],36:[17,168,205],37:[229,229,229],90:[102,102,102],91:[241,76,76],92:[35,209,139],93:[245,245,67],94:[59,142,234],95:[214,112,214],96:[41,184,219],97:[255,255,255]};
+const MASK = {" ":0,"▘":1,"▝":2,"▀":3,"▖":4,"▌":5,"▞":6,"▛":7,"▗":8,"▚":9,"▐":10,"▜":11,"▄":12,"▙":13,"▟":14,"█":15};
+const css = (rgb) => `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+const hex = (rgb) => "#" + rgb.map((v) => v.toString(16).padStart(2, "0")).join("");
+
+function colorOf(scene, key, role, mode) {
+  if (!key || key === "_") return null;
+  const t = scene.palette[key];
+  if (!t) return null;
+  if (mode === "mono") return role === "fg" ? [214, 218, 232] : null;
+  if (mode === "ansi16" || mode === "apple") return XTERM[role === "fg" ? t[3] : t[4] - 10] || t.slice(0, 3);
+  return t.slice(0, 3);
+}
+
+/** Decode cell i of a row string: 3 chars per cell (glyph, fg, bg). */
+function cellAt(row, i) {
+  return { g: row[i * 3], fg: row[i * 3 + 1], bg: row[i * 3 + 2] };
+}
+
+// ---------- renderer ----------
+function drawFrame(ctx, scene, frame, cw, opts) {
+  const ch = cw * 2;
+  const W = scene.cols * cw;
+  const H = scene.rows * ch;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#07080c";
+  ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = `${Math.round(ch * 0.82)}px "JetBrains Mono", Consolas, monospace`;
+  for (let r = 0; r < scene.rows; r++) {
+    const row = frame[r];
+    for (let c = 0; c < scene.cols; c++) {
+      const cell = cellAt(row, c);
+      const x = c * cw;
+      const y = r * ch;
+      const mask = MASK[cell.g];
+      let fg = colorOf(scene, cell.fg, "fg", opts.mode);
+      let bg = colorOf(scene, cell.bg, "bg", opts.mode);
+      if (mask === undefined) {
+        // overlay text glyph (sparkles, labels, trails)
+        if (bg) { ctx.fillStyle = css(bg); ctx.fillRect(x, y, cw, ch); }
+        ctx.fillStyle = fg ? css(fg) : "#d6dae8";
+        ctx.fillText(cell.g, x + cw / 2, y + ch / 2 + 1);
+        continue;
+      }
+      if (bg) { ctx.fillStyle = css(bg); ctx.fillRect(x, y, cw, ch); }
+      if (fg && mask) {
+        ctx.fillStyle = css(fg);
+        const hw = cw / 2, hh = ch / 2;
+        if (mask & 1) ctx.fillRect(x, y, hw, hh);
+        if (mask & 2) ctx.fillRect(x + hw, y, cw - hw, hh);
+        if (mask & 4) ctx.fillRect(x, y + hh, hw, ch - hh);
+        if (mask & 8) ctx.fillRect(x + hw, y + hh, cw - hw, ch - hh);
+      }
+    }
+  }
+  if (opts.grid) {
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let c = 0; c <= scene.cols; c++) { ctx.moveTo(c * cw + 0.5, 0); ctx.lineTo(c * cw + 0.5, H); }
+    for (let r = 0; r <= scene.rows; r++) { ctx.moveTo(0, r * ch + 0.5); ctx.lineTo(W, r * ch + 0.5); }
+    ctx.stroke();
+  }
+  if (opts.focus) {
+    ctx.strokeStyle = "#facc48";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(opts.focus.c * cw + 1, opts.focus.r * ch + 1, cw - 2, ch - 2);
+  }
+}
+
+// ANSI bytes, mirroring frameToAnsiLines + renderSynchronizedFrame
+function ansiLines(scene, frame, mode) {
+  return frame.map((row) => {
+    let out = "", cur = "";
+    for (let c = 0; c < scene.cols; c++) {
+      let cell = cellAt(row, c);
+      if (mode === "mono") { out += cell.g; continue; }
+      if (mode === "apple" && MASK[cell.g] === 15 && cell.fg !== "_") cell = { g: " ", fg: "_", bg: cell.fg };
+      const t = scene.palette;
+      const codes = [];
+      const f = cell.fg !== "_" ? t[cell.fg] : null;
+      const b = cell.bg !== "_" ? t[cell.bg] : null;
+      if (f) codes.push(mode === "truecolor" ? `38;2;${f[0]};${f[1]};${f[2]}` : String(f[3]));
+      if (b) codes.push(mode === "truecolor" ? `48;2;${b[0]};${b[1]};${b[2]}` : String(b[4]));
+      const sgr = codes.length ? `\x1b[${codes.join(";")}m` : "";
+      if (sgr !== cur) { if (cur) out += "\x1b[0m"; out += sgr; cur = sgr; }
+      out += cell.g;
+    }
+    if (cur) out += "\x1b[0m";
+    return out;
+  });
+}
+const enc = new TextEncoder();
+const byteLen = (s) => enc.encode(s).length;
+function payloadBytes(lines, prev) {
+  const SYNC = 16;
+  if (!prev) return lines.reduce((s, l) => s + byteLen(l) + 1, 0) + SYNC;
+  let n = 0, any = false;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i] !== prev[i]) { n += byteLen(lines[i]) + 8; any = true; } else n += 0;
+  }
+  return any ? n + 8 + SYNC : 0;
+}
+
+// ---------- timelines ----------
+function sequence(scene, name) {
+  const tl = scene.timelines[name];
+  return tl;
+}
+
+class Clip {
+  constructor(scene, timeline) { this.set(scene, timeline); }
+  set(scene, timeline) {
+    this.scene = scene;
+    this.name = timeline || scene.defaultTimeline;
+    this.tl = scene.timelines[this.name];
+    this.i = 0;
+    this.acc = 0;
+    this.done = false;
+  }
+  get frameIndex() { return this.tl.seq[this.i]; }
+  get frame() { return this.scene.frames[this.frameIndex]; }
+  advance(dt) {
+    if (this.done) return false;
+    this.acc += dt;
+    let moved = false;
+    while (this.acc >= this.tl.dur[this.i]) {
+      this.acc -= this.tl.dur[this.i];
+      if (this.i + 1 >= this.tl.seq.length) {
+        if (!this.tl.loop) { this.done = true; this.acc = 0; return moved; }
+        this.i = 0;
+      } else this.i++;
+      moved = true;
+    }
+    return moved;
+  }
+  step() { this.i = (this.i + 1) % this.tl.seq.length; this.acc = 0; this.done = false; }
+}
+
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---------- hero ----------
+const heroScene = DATA.scenes.find((s) => s.id === "logo") || DATA.scenes[0];
+const heroCanvas = document.getElementById("hero");
+const heroCtx = heroCanvas.getContext("2d");
+const heroClip = new Clip(heroScene);
+const heroCw = 12;
+heroCanvas.width = heroScene.cols * heroCw;
+heroCanvas.height = heroScene.rows * heroCw * 2;
+// Open on the finished title, not on the empty first frames of the reveal.
+{ const k = heroScene.timelines[heroClip.name].seq.indexOf(heroScene.still); heroClip.i = k < 0 ? 0 : k; }
+
+// facts
+const totalFrames = DATA.scenes.reduce((s, sc) => s + Object.values(sc.timelines).reduce((a, t) => a + t.seq.length, 0), 0);
+document.getElementById("facts").innerHTML = [
+  `<span class="fact"><b>2×2</b> sub-pixels per cell</span>`,
+  `<span class="fact"><b>16</b> masks → glyphs</span>`,
+  `<span class="fact"><b>≤2</b> colors per cell, solved</span>`,
+  `<span class="fact"><b>DEC 2026</b> synced frames</span>`,
+  `<span class="fact"><b>${DATA.scenes.length}</b> scenes &amp; rigs · <b>${totalFrames}</b> frames</span>`,
+].join("");
+document.getElementById("foot-count").textContent = `${DATA.scenes.length} scenes and rigs, ${totalFrames} timeline frames, built ${DATA.built}`;
+
+// ---------- player ----------
+const stage = document.getElementById("stage");
+const sctx = stage.getContext("2d");
+const tabs = document.getElementById("tabs");
+const state = { scene: null, clip: null, playing: !reduce, speed: 1, mode: "truecolor", render: "pixels", grid: false, focus: null, prevLines: null, lastIdx: -1 };
+
+function stageCw(scene) {
+  const avail = Math.max(240, document.getElementById("term-body").clientWidth - 32);
+  return Math.max(4, Math.min(20, Math.floor(avail / scene.cols)));
+}
+
+function selectScene(scene, timeline) {
+  state.scene = scene;
+  state.clip = new Clip(scene, timeline);
+  if (reduce) { const k = state.clip.tl.seq.indexOf(scene.still); state.clip.i = k < 0 ? 0 : k; }
+  state.prevLines = null;
+  state.lastIdx = -1;
+  state.focus = null;
+  for (const b of tabs.children) b.setAttribute("aria-selected", String(b.dataset.id === scene.id));
+  document.getElementById("term-title").textContent = `${scene.title} — ${scene.kind === "rig" ? "rig" : "scene"}`;
+  document.getElementById("term-size").textContent = `${scene.cols}×${scene.rows} cells · ${scene.cols * 2}×${scene.rows * 2} sub-px`;
+  document.getElementById("desc").textContent = scene.description;
+  const chips = document.getElementById("timelines");
+  const names = Object.keys(scene.timelines);
+  document.getElementById("timelines-row").hidden = names.length < 2;
+  chips.innerHTML = "";
+  for (const n of names) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = n;
+    b.setAttribute("aria-pressed", String(n === state.clip.name));
+    b.onclick = () => { selectScene(scene, n); };
+    chips.appendChild(b);
+  }
+  resizeStage();
+  renderStage(true);
+}
+
+function resizeStage() {
+  const s = state.scene;
+  const cw = stageCw(s);
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  stage.width = s.cols * cw * dpr;
+  stage.height = s.rows * cw * 2 * dpr;
+  stage.style.width = `${s.cols * cw}px`;
+  stage.style.height = `${s.rows * cw * 2}px`;
+  state.cw = cw;
+  state.dpr = dpr;
+  const text = document.getElementById("term-text");
+  text.style.fontSize = `${Math.max(8, cw * 1.66)}px`;
+}
+
+function renderStage(force) {
+  const s = state.scene;
+  const idx = state.clip.frameIndex;
+  const frame = s.frames[idx];
+  const text = document.getElementById("term-text");
+  const glyphMode = state.render === "glyphs";
+  stage.hidden = glyphMode;
+  text.hidden = !glyphMode;
+  if (glyphMode) {
+    let html = "";
+    for (let r = 0; r < s.rows; r++) {
+      for (let c = 0; c < s.cols; c++) {
+        let cell = cellAt(frame[r], c);
+        if (state.mode === "apple" && MASK[cell.g] === 15 && cell.fg !== "_") cell = { g: " ", fg: "_", bg: cell.fg };
+        const fg = colorOf(s, cell.fg, "fg", state.mode);
+        const bg = colorOf(s, cell.bg, "bg", state.mode);
+        const st = (fg ? `color:${css(fg)};` : "") + (bg ? `background:${css(bg)};` : "");
+        const g = cell.g === "<" ? "&lt;" : cell.g === "&" ? "&amp;" : cell.g;
+        html += st ? `<span style="${st}">${g}</span>` : g;
+      }
+      html += "\n";
+    }
+    text.innerHTML = html;
+  } else {
+    sctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+    drawFrame(sctx, s, frame, state.cw, { mode: state.mode, grid: state.grid, focus: state.focus });
+  }
+  if (force || idx !== state.lastIdx) {
+    const lines = ansiLines(s, frame, state.mode);
+    const full = payloadBytes(lines, null);
+    const diff = state.prevLines ? payloadBytes(lines, state.prevLines) : full;
+    state.prevLines = lines;
+    state.lastIdx = idx;
+    const tl = state.clip.tl;
+    document.getElementById("s-frame").textContent = `${state.clip.i + 1} / ${tl.seq.length}`;
+    document.getElementById("s-hold").textContent = `${tl.dur[state.clip.i]} ms`;
+    document.getElementById("s-canvas").textContent = `${s.cols}×${s.rows}`;
+    document.getElementById("s-full").textContent = `≈ ${full.toLocaleString()} B`;
+    document.getElementById("s-diff").textContent = diff === 0 ? "0 B (unchanged)" : `≈ ${diff.toLocaleString()} B`;
+    document.getElementById("s-bar").style.width = `${Math.round((diff / Math.max(1, full)) * 100)}%`;
+  }
+  if (state.focus) inspect(state.focus);
+}
+
+function inspect({ c, r }) {
+  const s = state.scene;
+  const frame = s.frames[state.clip.frameIndex];
+  const cell = cellAt(frame[r], c);
+  const mask = MASK[cell.g];
+  const fg = colorOf(s, cell.fg, "fg", state.mode);
+  const bg = colorOf(s, cell.bg, "bg", state.mode);
+  document.getElementById("i-cell").textContent = `col ${c}, row ${r}`;
+  document.getElementById("i-glyph").textContent = cell.g === " " ? "␠" : cell.g;
+  document.getElementById("i-glyph").style.color = fg ? css(fg) : "var(--muted)";
+  document.getElementById("i-mask").textContent = mask === undefined ? "overlay text" : `${mask.toString(2).padStart(4, "0")} = ${mask}`;
+  document.getElementById("i-cp").textContent = "U+" + cell.g.codePointAt(0).toString(16).toUpperCase().padStart(4, "0");
+  const sw = (rgb, key) => (rgb ? `<span class="swatch" style="background:${css(rgb)}"></span>${(s.names[key] || key)} ${hex(rgb)}` : "none");
+  document.getElementById("i-fg").innerHTML = sw(fg, cell.fg);
+  document.getElementById("i-bg").innerHTML = sw(bg, cell.bg);
+  const z = document.getElementById("zoom").getContext("2d");
+  z.fillStyle = "#07080c";
+  z.fillRect(0, 0, 96, 96);
+  // 2x2 sub-pixels drawn square for legibility, with bit labels
+  const q = [[0, 0, 1], [48, 0, 2], [0, 48, 4], [48, 48, 8]];
+  z.font = '600 11px "JetBrains Mono", monospace';
+  for (const [x, y, bit] of q) {
+    const on = mask !== undefined && mask & bit;
+    const col = on ? fg : bg;
+    z.fillStyle = col ? css(col) : "#11131b";
+    z.fillRect(x + 2, y + 2, 44, 44);
+    z.fillStyle = col && (col[0] + col[1] + col[2]) > 380 ? "#0e1016" : "#e7e9f3";
+    z.fillText({ 1: "TL", 2: "TR", 4: "BL", 8: "BR" }[bit], x + 6, y + 16);
+  }
+}
+
+const pick = (e) => {
+  const rect = stage.getBoundingClientRect();
+  const c = Math.floor(((e.clientX - rect.left) / rect.width) * state.scene.cols);
+  const r = Math.floor(((e.clientY - rect.top) / rect.height) * state.scene.rows);
+  if (c < 0 || r < 0 || c >= state.scene.cols || r >= state.scene.rows) return;
+  state.focus = { c, r };
+  renderStage(false);
+};
+stage.addEventListener("pointermove", pick);
+stage.addEventListener("pointerdown", pick);
+stage.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") { state.focus = null; renderStage(false); } });
+
+document.getElementById("play").onclick = (e) => {
+  state.playing = !state.playing;
+  e.currentTarget.textContent = state.playing ? "Pause" : "Play";
+  if (state.playing && state.clip.done) state.clip.set(state.scene, state.clip.name);
+};
+document.getElementById("step").onclick = () => { state.playing = false; document.getElementById("play").textContent = "Play"; state.clip.step(); renderStage(false); };
+document.getElementById("speed").oninput = (e) => { state.speed = Number(e.target.value); document.getElementById("speed-v").textContent = `${state.speed}×`; };
+document.getElementById("mode").onchange = (e) => { state.mode = e.target.value; state.prevLines = null; renderStage(true); };
+document.getElementById("render").onchange = (e) => { state.render = e.target.value; renderStage(true); };
+document.getElementById("grid").onchange = (e) => { state.grid = e.target.checked; renderStage(false); };
+document.getElementById("copy").onclick = async (e) => {
+  const lines = ansiLines(state.scene, state.clip.frame, state.mode === "mono" ? "mono" : "truecolor");
+  const esc = lines.join("\n").replace(/\x1b/g, "\\033").replace(/'/g, "'\\''");
+  const cmd = `printf '%b\\n' '${esc}'`;
+  const btn = e.currentTarget;
+  try { await navigator.clipboard.writeText(cmd); btn.textContent = "Copied — paste in a terminal"; }
+  catch { btn.textContent = "Clipboard blocked"; }
+  setTimeout(() => (btn.textContent = "Copy frame as printf"), 1800);
+};
+
+for (const s of DATA.scenes) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "tab";
+  b.role = "tab";
+  b.dataset.id = s.id;
+  b.textContent = s.title;
+  b.onclick = () => selectScene(s);
+  tabs.appendChild(b);
+}
+
+// ---------- cast ----------
+const actors = [];
+const castEl = document.getElementById("cast");
+for (const s of DATA.scenes.filter((x) => x.kind === "rig")) {
+  const el = document.createElement("article");
+  el.className = "actor";
+  const cw = Math.max(6, Math.min(16, Math.floor(220 / s.cols)));
+  el.innerHTML = `<div class="stage"><canvas width="${s.cols * cw}" height="${s.rows * cw * 2}" aria-label="${s.title}"></canvas></div>
+    <div class="meta"><h3>${s.title}</h3><p>${s.description}</p><div class="chips"></div></div>`;
+  const canvas = el.querySelector("canvas");
+  const actor = { s, cw, ctx: canvas.getContext("2d"), clip: new Clip(s), last: -1 };
+  if (reduce) actor.clip.i = Math.max(0, actor.clip.tl.seq.indexOf(s.still));
+  const chips = el.querySelector(".chips");
+  for (const n of Object.keys(s.timelines)) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = n;
+    b.setAttribute("aria-pressed", String(n === actor.clip.name));
+    b.onclick = () => {
+      actor.clip.set(s, n);
+      actor.last = -1;
+      for (const x of chips.children) x.setAttribute("aria-pressed", String(x === b));
+    };
+    chips.appendChild(b);
+  }
+  castEl.appendChild(el);
+  actors.push(actor);
+}
+
+// ---------- loop ----------
+let last = performance.now();
+function tick(now) {
+  const dt = Math.min(250, now - last);
+  last = now;
+  if (!reduce) {
+    if (heroClip.advance(dt) || heroClip.lastDrawn === undefined) {
+      heroCtx.setTransform(1, 0, 0, 1, 0, 0);
+      drawFrame(heroCtx, heroScene, heroClip.frame, heroCw, { mode: "truecolor" });
+      heroClip.lastDrawn = heroClip.i;
+    }
+    if (state.playing && state.clip.advance(dt * state.speed)) renderStage(false);
+    for (const a of actors) {
+      a.clip.advance(dt);
+      if (a.clip.frameIndex !== a.last) {
+        drawFrame(a.ctx, a.s, a.clip.frame, a.cw, { mode: "truecolor" });
+        a.last = a.clip.frameIndex;
+      }
+    }
+  }
+  requestAnimationFrame(tick);
+}
+drawFrame(heroCtx, heroScene, heroClip.frame, heroCw, { mode: "truecolor" });
+for (const a of actors) drawFrame(a.ctx, a.s, a.clip.frame, a.cw, { mode: "truecolor" });
+selectScene(DATA.scenes.find((s) => s.id === "runner") || DATA.scenes[0]);
+addEventListener("resize", () => { resizeStage(); renderStage(true); });
+requestAnimationFrame(tick);
+</script>

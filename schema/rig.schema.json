@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quadmotion.dev/schema/rig.schema.json",
+  "title": "QuadMotion rig",
+  "description": "A terminal mascot authored at 2x resolution: each terminal cell holds 2x2 sub-pixels compiled to Unicode quadrant glyphs.",
+  "type": "object",
+  "required": ["name", "canvas", "palette", "poses", "timelines"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "kebab-case identifier" },
+    "description": { "type": "string" },
+    "canvas": {
+      "type": "object",
+      "description": "Fixed container size in terminal cells. Sub-pixel grid is cols*2 x rows*2. Every frame of every timeline keeps this size.",
+      "required": ["cols", "rows"],
+      "additionalProperties": false,
+      "properties": {
+        "cols": { "type": "integer", "minimum": 1 },
+        "rows": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "tickMs": { "type": "number", "minimum": 16, "description": "Default base tick for timelines (60 ms is typical)." },
+    "palette": {
+      "type": "object",
+      "description": "Single-character tokens. Declaration order breaks ties (earlier = foreground). '.' and ' ' are always transparent.",
+      "propertyNames": { "minLength": 1, "maxLength": 1 },
+      "additionalProperties": { "$ref": "#/$defs/token" }
+    },
+    "poses": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/pose" }
+    },
+    "timelines": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/timeline" }
+    },
+    "defaultTimeline": { "type": "string" },
+    "reducedMotionPose": { "type": "string", "description": "Still pose drawn when reduced motion is requested." },
+    "events": {
+      "type": "object",
+      "description": "Timeline to play on host events (used by the Claude Code mod adapter).",
+      "properties": {
+        "session.start": { "type": "string" },
+        "idle": { "type": "string" },
+        "tool.call": { "type": "string" },
+        "turn.complete": { "type": "string" }
+      },
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "token": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "transparent": { "type": "boolean" },
+        "rgb": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0, "maximum": 255 },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "ansi16": { "type": "integer", "description": "16-color SGR foreground code: 30..37 or 90..97." },
+        "ansi16Bg": { "type": "integer", "description": "16-color SGR background code; defaults to ansi16 + 10." }
+      },
+      "anyOf": [{ "required": ["transparent"] }, { "required": ["rgb", "ansi16"] }]
+    },
+    "layer": {
+      "oneOf": [
+        { "type": "string", "description": "Name of another pose." },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pose": { "type": "string" },
+            "pixels": { "type": "array", "items": { "type": "string" }, "description": "Rows of tokens, 2 sub-pixels per terminal column." },
+            "dx": { "type": "integer", "description": "Sub-pixel shift right." },
+            "dy": { "type": "integer", "description": "Sub-pixel shift down." },
+            "remap": { "type": "object", "additionalProperties": { "type": "string", "maxLength": 1 }, "description": "Token substitution, e.g. {\"E\": \"#\"} closes the eyes." }
+          }
+        }
+      ]
+    },
+    "pose": {
+      "oneOf": [
+        { "$ref": "#/$defs/layer" },
+        {
+          "type": "object",
+          "required": ["layers"],
+          "additionalProperties": false,
+          "properties": {
+            "layers": { "type": "array", "items": { "$ref": "#/$defs/layer" }, "minItems": 1, "description": "Stacked bottom to top; transparent pixels show what is below (body, eyes, costume, effects)." }
+          }
+        }
+      ]
+    },
+    "overlay": {
+      "type": "object",
+      "required": ["text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "description": "Drawn cell by cell; CJK/emoji take two columns." },
+        "col": { "type": "integer", "minimum": 0 },
+        "row": { "type": "integer", "minimum": 0 },
+        "fg": { "type": "string", "description": "Palette token." },
+        "bg": { "type": "string", "description": "Palette token." }
+      }
+    },
+    "frame": {
+      "oneOf": [
+        { "type": "string", "description": "Pose name, held one tick." },
+        {
+          "type": "object",
+          "required": ["pose"],
+          "additionalProperties": false,
+          "properties": {
+            "pose": { "type": "string" },
+            "hold": { "type": "integer", "minimum": 1, "description": "Ticks to hold this pose." },
+            "dx": { "type": "integer" },
+            "dy": { "type": "integer" },
+            "overlays": { "type": "array", "items": { "$ref": "#/$defs/overlay" } }
+          }
+        }
+      ]
+    },
+    "timeline": {
+      "type": "object",
+      "required": ["frames"],
+      "additionalProperties": false,
+      "properties": {
+        "tickMs": { "type": "number", "minimum": 16 },
+        "loop": { "type": "boolean", "default": true },
+        "frames": { "type": "array", "items": { "$ref": "#/$defs/frame" }, "minItems": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "name": "quadmotion",
+  "version": "0.1.0",
+  "description": "2x2 Unicode quadrant pixel-art compiler and flicker-free terminal animation engine (DEC Mode 2026, Ink, Claude Code mods, SVG SMIL).",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "quadmotion": "./src/cli.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.mjs"
+    },
+    "./ink": "./src/adapters/ink-widget.mjs",
+    "./svg": "./src/adapters/svg-smil.mjs",
+    "./scenes": "./src/scenes/index.mjs"
+  },
+  "files": [
+    "src",
+    "schema",
+    "assets",
+    "index.d.ts",
+    "skills"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "build:skill": "node tools/build-skill.mjs",
+    "build:showcase": "node tools/build-showcase.mjs",
+    "build": "node tools/build-skill.mjs && node tools/build-showcase.mjs",
+    "demo": "node src/cli.mjs demo",
+    "preview": "node src/cli.mjs preview --input assets/pip.rig.json",
+    "validate": "node src/cli.mjs validate --input assets/pip.rig.json"
+  },
+  "peerDependencies": {
+    "ink": ">=4",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "ink": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LiquidRing/quadmotion.git"
+  },
+  "keywords": [
+    "terminal",
+    "unicode",
+    "pixel-art",
+    "ansi",
+    "animation",
+    "tui",
+    "ink",
+    "claude-code",
+    "agent-skills"
+  ]
+}

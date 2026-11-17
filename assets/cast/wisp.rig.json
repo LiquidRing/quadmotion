@@ -1,0 +1,253 @@
+{
+  "$schema": "../../schema/rig.schema.json",
+  "name": "wisp",
+  "description": "Wisp: an original friendly lavender spirit with glowing cyan eyes and a rippling hem. Floats, gets spooked. MIT, free to reuse.",
+  "canvas": {
+    "cols": 8,
+    "rows": 4
+  },
+  "palette": {
+    "#": { "name": "spirit", "rgb": [196, 168, 245], "ansi16": 95 },
+    "E": { "name": "glow", "rgb": [150, 255, 240], "ansi16": 96 },
+    "V": { "name": "shade", "rgb": [92, 56, 150], "ansi16": 35 }
+  },
+  "poses": {
+    "float": {
+      "pixels": [
+        "....######......",
+        "..##########....",
+        ".###EE##EE###...",
+        ".###EE##EE###...",
+        ".#####VV#####...",
+        "..##########....",
+        ".....########...",
+        "..........###..."
+      ]
+    },
+    "float_b": {
+      "pixels": [
+        "....######......",
+        "..##########....",
+        ".###EE##EE###...",
+        ".###EE##EE###...",
+        ".#####VV#####...",
+        "..##########....",
+        "....########....",
+        "......####......"
+      ]
+    },
+    "float_c": {
+      "pixels": [
+        "....######......",
+        "..##########....",
+        ".###EE##EE###...",
+        ".###EE##EE###...",
+        ".#####VV#####...",
+        "..##########....",
+        ".....#######..#.",
+        ".........#####.."
+      ]
+    },
+    "low": {
+      "pixels": [
+        "................",
+        "....######......",
+        "..##########....",
+        ".###EE##EE###...",
+        ".###EE##EE###...",
+        ".#####VV#####...",
+        "...#########....",
+        ".......#######.."
+      ]
+    },
+    "low_b": {
+      "pixels": [
+        "................",
+        "....######......",
+        "..##########....",
+        ".###EE##EE###...",
+        ".###EE##EE###...",
+        ".#####VV#####...",
+        "...#########....",
+        ".....######....."
+      ]
+    },
+    "low_c": {
+      "pixels": [
+        "................",
+        "....######......",
+        "..##########....",
+        ".###EE##EE###...",
+        ".###EE##EE###...",
+        ".#####VV#####...",
+        "...#########..#.",
+        "........######.."
+      ]
+    },
+    "blink": {
+      "pose": "float",
+      "remap": {
+        "E": "#"
+      }
+    },
+    "blink_low": {
+      "pose": "low_b",
+      "remap": {
+        "E": "#"
+      }
+    },
+    "spooked": {
+      "pixels": [
+        "..##########....",
+        "..##EE##EE##....",
+        ".###EE##EE###...",
+        ".###EE##EE###...",
+        ".#####VV#####...",
+        "...#########....",
+        "....########....",
+        "......#..#......"
+      ]
+    },
+    "spooked_b": {
+      "pixels": [
+        "..##########....",
+        "..##EE##EE##....",
+        ".###EE##EE###...",
+        ".###EE##EE###...",
+        ".#####VV#####...",
+        "...#########....",
+        "....########....",
+        ".....#..#......."
+      ]
+    },
+    "sigh": {
+      "pixels": [
+        "................",
+        "....######......",
+        "..##########....",
+        ".############...",
+        ".###VV##VV###...",
+        ".############...",
+        "...#########....",
+        ".....######....."
+      ]
+    }
+  },
+  "timelines": {
+    "float": {
+      "tickMs": 90,
+      "loop": true,
+      "frames": [
+        { "pose": "float", "hold": 3 },
+        { "pose": "float_b", "hold": 3 },
+        { "pose": "float_c", "hold": 3 },
+        { "pose": "low", "hold": 3 },
+        { "pose": "low_b", "hold": 3 },
+        { "pose": "low_c", "hold": 3 },
+        { "pose": "float", "hold": 3 },
+        { "pose": "float_b", "hold": 3 },
+        { "pose": "float_c", "hold": 3 },
+        { "pose": "low", "hold": 3 },
+        { "pose": "low_b", "hold": 3 },
+        { "pose": "low_c", "hold": 3 },
+        { "pose": "float", "hold": 3 },
+        { "pose": "blink", "hold": 2 },
+        { "pose": "float_c", "hold": 3 },
+        { "pose": "low", "hold": 3 },
+        { "pose": "blink_low", "hold": 2 },
+        { "pose": "low_c", "hold": 3 }
+      ]
+    },
+    "spooked": {
+      "tickMs": 60,
+      "loop": false,
+      "frames": [
+        { "pose": "float", "hold": 4 },
+        {
+          "pose": "spooked",
+          "hold": 4,
+          "overlays": [
+            {
+              "text": "!",
+              "col": 7,
+              "row": 0,
+              "fg": "E"
+            }
+          ]
+        },
+        {
+          "pose": "spooked_b",
+          "hold": 1,
+          "dx": 1,
+          "overlays": [
+            {
+              "text": "!",
+              "col": 7,
+              "row": 0,
+              "fg": "E"
+            }
+          ]
+        },
+        {
+          "pose": "spooked",
+          "hold": 1,
+          "dx": -1,
+          "overlays": [
+            {
+              "text": "!",
+              "col": 7,
+              "row": 0,
+              "fg": "E"
+            }
+          ]
+        },
+        {
+          "pose": "spooked_b",
+          "hold": 1,
+          "dx": 1,
+          "overlays": [
+            {
+              "text": "!",
+              "col": 7,
+              "row": 0,
+              "fg": "E"
+            }
+          ]
+        },
+        {
+          "pose": "spooked",
+          "hold": 1,
+          "dx": -1,
+          "overlays": [
+            {
+              "text": "!",
+              "col": 7,
+              "row": 0,
+              "fg": "E"
+            }
+          ]
+        },
+        { "pose": "spooked_b", "hold": 1, "dx": 1 },
+        { "pose": "spooked", "hold": 1, "dx": -1 },
+        { "pose": "spooked_b", "hold": 1, "dx": 1 },
+        { "pose": "spooked", "hold": 1, "dx": -1 },
+        { "pose": "spooked", "hold": 8 },
+        { "pose": "blink", "hold": 3 },
+        { "pose": "sigh", "hold": 10 },
+        { "pose": "low_b", "hold": 4 },
+        { "pose": "low_c", "hold": 4 },
+        { "pose": "float", "hold": 4 },
+        { "pose": "blink", "hold": 2 },
+        { "pose": "float", "hold": 10 }
+      ]
+    }
+  },
+  "defaultTimeline": "float",
+  "reducedMotionPose": "float",
+  "events": {
+    "session.start": "spooked",
+    "idle": "float",
+    "tool.call": "float",
+    "turn.complete": "spooked"
+  }
+}

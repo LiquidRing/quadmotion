@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+
+  node20-runtime:
+    # The engine and the skill scripts promise Node 20+ with no dependencies.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node src/cli.mjs validate --input assets/pip.rig.json
+      - run: for f in assets/cast/*.rig.json; do node src/cli.mjs validate --input "$f"; done
+      - run: node src/cli.mjs compile --input assets/pip.rig.json --target all --out dist
+      - run: node dist/pip.player.mjs jump_wave
+      - run: node src/cli.mjs demo --seconds 1
+      - name: Skill runs from a copy outside the repo
+        run: |
+          cp -r skills/quadrant-pixel-animator "$RUNNER_TEMP/skill"
+          cd "$RUNNER_TEMP/skill"
+          node scripts/validate.mjs --input assets/starter-companion.rig.json
+          node scripts/compile.mjs --input assets/starter-companion.rig.json --target ansi,claude-mod,svg --out out
