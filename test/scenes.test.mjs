@@ -40,9 +40,9 @@ test("the ball never leaves the physics canvas", () => {
 });
 
 test("scenes export to SVG", () => {
-  const [s] = buildScenes(["runner"]);
+  const [s] = buildScenes(["physics"]);
   const svg = generateSvg(s, { timeline: "main", background: "#0e1016" });
-  assert.match(svg, /<rect width="104" height="24" fill="#0e1016"\/>/);
+  assert.match(svg, /<rect width="72" height="24" fill="#0e1016"\/>/);
   assert.match(svg, /calcMode="discrete"/);
 });
 

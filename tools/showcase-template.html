@@ -55,6 +55,19 @@ code, kbd, .mono { font-family: var(--font-term); font-size: 0.92em; }
 .fact b { color: var(--teal); font-weight: 600; }
 @media (max-width: 760px) { .hero-copy { grid-template-columns: 1fr; } .facts { justify-content: flex-start; } }
 
+/* Live stage */
+.hero { padding-block: 32px 28px; }
+.live .term-body { padding: 14px; }
+.live canvas { cursor: pointer; outline: none; }
+.live canvas:focus-visible { box-shadow: 0 0 0 2px var(--bulb); }
+.live-hints { gap: 6px 16px; }
+kbd { font: 600 11px/1 var(--font-term); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 3px 6px; }
+.act-groups { display: grid; gap: 8px; padding: 10px 12px 14px; border-top: 1px solid var(--line); background: var(--panel); }
+.act-row { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 10px; align-items: start; }
+.act-row > .ctl { padding-top: 6px; }
+@media (max-width: 600px) { .act-row { grid-template-columns: 1fr; } }
+.tab-group { flex-basis: 100%; font: 600 11px/1 var(--font-term); text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); padding-top: 6px; }
+
 /* Player */
 section { padding-block: 34px; border-top: 1px solid var(--line); display: grid; gap: 18px; }
 .section-head { display: grid; gap: 8px; }
@@ -118,21 +131,35 @@ footer { padding-block: 26px 40px; border-top: 1px solid var(--line); color: var
 
 <div class="wrap">
   <header class="hero">
-    <div class="hero-stage"><canvas id="hero" aria-label="QuadMotion title animation, rendered from quadrant glyph cells"></canvas></div>
     <div class="hero-copy">
       <div style="display:grid;gap:10px">
-        <span class="eyebrow">terminal pixel-art engine</span>
-        <h1>Four pixels per cell.<br><span>Zero flicker.</span></h1>
-        <p>QuadMotion compiles pixel grids into Unicode quadrant glyphs <span class="mono">▘▝▀▖▌▞▛▗▚▐▜▄▙▟█</span>, solves the two-colors-per-cell limit, and plays hold-timed animation in a fixed-height box with diffed, DEC&nbsp;2026-synchronized frames. Everything below is drawn from the engine's real compiled cells.</p>
+        <span class="eyebrow">QuadMotion · terminal pixel-art engine</span>
+        <h1>Meet <span>Pip</span>. Poke him.</h1>
+        <p>Pip lives in a terminal: every frame below is compiled to Unicode quadrant glyphs <span class="mono">▘▝▀▖▌▞▛▗▚▐▜▄▙▟█</span>, two colors per cell, the same bytes a terminal would get. He is a puppet of small authored parts, his feet are planted, and every action has an anticipation, a release, a held contact and a settle.</p>
       </div>
       <div class="facts" id="facts"></div>
+    </div>
+    <div class="live" id="live">
+      <div class="term">
+        <div class="term-bar"><span>pip@stage — live</span><span id="live-info"></span></div>
+        <div class="term-body live-body"><canvas id="live-canvas" tabindex="0" aria-label="Live stage with Pip. Click Pip for a reaction, click the ground to walk there, arrow keys walk, Shift runs, Space jumps."></canvas><pre class="term-text" id="live-text" hidden></pre></div>
+        <div class="controls live-hints">
+          <span class="ctl"><kbd>click Pip</kbd> react</span>
+          <span class="ctl"><kbd>click ground</kbd> walk there</span>
+          <span class="ctl"><kbd>← →</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump</span>
+          <label class="ctl" for="live-render">render
+            <select id="live-render"><option value="pixels">pixels</option><option value="glyphs">real glyphs</option></select>
+          </label>
+        </div>
+        <div class="act-groups" id="act-groups"></div>
+      </div>
     </div>
   </header>
 
   <section aria-labelledby="player-h">
     <div class="section-head">
       <span class="eyebrow">player</span>
-      <h2 id="player-h">Scenes</h2>
+      <h2 id="player-h">Recorded acts &amp; engine demos</h2>
       <p class="hint">In pixel render, hover or tap a cell to inspect its 2×2 sub-pixels, mask and colors. Switch the color mode to see how the same frame degrades on 16-color terminals and Apple Terminal.</p>
     </div>
     <div class="tabs" role="tablist" id="tabs"></div>
@@ -373,16 +400,116 @@ class Clip {
 
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ---------- hero ----------
-const heroScene = DATA.scenes.find((s) => s.id === "logo") || DATA.scenes[0];
-const heroCanvas = document.getElementById("hero");
-const heroCtx = heroCanvas.getContext("2d");
-const heroClip = new Clip(heroScene);
-const heroCw = 12;
-heroCanvas.width = heroScene.cols * heroCw;
-heroCanvas.height = heroScene.rows * heroCw * 2;
-// Open on the finished title, not on the empty first frames of the reveal.
-{ const k = heroScene.timelines[heroClip.name].seq.indexOf(heroScene.still); heroClip.i = k < 0 ? 0 : k; }
+// ---------- live stage ----------
+const live = window.QMStage.createLive({ seed: 11 });
+const liveScene = {
+  cols: live.world.cols,
+  rows: live.world.rows,
+  palette: Object.fromEntries(Object.entries(live.palette).map(([k, t]) => [k, [...t.rgb, t.ansi16, t.ansi16Bg]])),
+  names: Object.fromEntries(Object.entries(live.palette).map(([k, t]) => [k, t.name])),
+};
+const liveCanvas = document.getElementById("live-canvas");
+const liveCtx = liveCanvas.getContext("2d");
+const liveText = document.getElementById("live-text");
+let liveCw = 12;
+let liveRender = "pixels";
+let liveFrame = null;
+const encodeLive = (f) => f.cells.map((line) => line.map((c) => (c.skip ? "​" : c.glyph) + (c.fg ?? "_") + (c.bg ?? "_")).join(""));
+function sizeLive() {
+  const avail = Math.max(260, liveCanvas.parentElement.clientWidth - 32);
+  liveCw = Math.max(4, Math.min(16, Math.floor(avail / liveScene.cols / 2) * 2));
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  liveCanvas.width = liveScene.cols * liveCw * dpr;
+  liveCanvas.height = liveScene.rows * liveCw * 2 * dpr;
+  liveCanvas.style.width = `${liveScene.cols * liveCw}px`;
+  liveCanvas.style.height = `${liveScene.rows * liveCw * 2}px`;
+  liveText.style.fontSize = `${Math.max(7, liveCw * 1.66)}px`;
+}
+function drawLive() {
+  liveFrame = encodeLive(live.frame());
+  const glyphs = liveRender === "glyphs";
+  liveCanvas.hidden = glyphs;
+  liveText.hidden = !glyphs;
+  if (glyphs) {
+    let html = "";
+    for (let r = 0; r < liveScene.rows; r++) {
+      for (let c = 0; c < liveScene.cols; c++) {
+        const cell = cellAt(liveFrame[r], c);
+        const fg = colorOf(liveScene, cell.fg, "fg", "truecolor");
+        const bg = colorOf(liveScene, cell.bg, "bg", "truecolor");
+        const st = (fg ? `color:${css(fg)};` : "") + (bg ? `background:${css(bg)};` : "");
+        const g = cell.g === "<" ? "&lt;" : cell.g === "&" ? "&amp;" : cell.g;
+        html += st ? `<span style="${st}">${g}</span>` : g;
+      }
+      html += "\n";
+    }
+    liveText.innerHTML = html;
+  } else {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    liveCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawFrame(liveCtx, liveScene, liveFrame, liveCw, { mode: "truecolor" });
+  }
+  const bytes = payloadBytes(ansiLines(liveScene, liveFrame, "truecolor"), null);
+  document.getElementById("live-info").textContent = `${liveScene.cols}×${liveScene.rows} cells · ${live.TICK_MS} ms tick · ≈ ${bytes.toLocaleString()} B/frame`;
+}
+const keys = { left: false, right: false };
+function stageHit(e, el = liveCanvas) {
+  const rect = el.getBoundingClientRect();
+  const c = Math.floor(((e.clientX - rect.left) / rect.width) * liveScene.cols);
+  const r = Math.floor(((e.clientY - rect.top) / rect.height) * liveScene.rows);
+  const pc = live.pipCells();
+  if (pc && c >= pc.c0 - 1 && c <= pc.c1 + 1 && r >= pc.r0 - 1 && r <= pc.r1) live.poke();
+  else live.goto(c * 2 + 1);
+}
+liveCanvas.addEventListener("pointerdown", (e) => { liveCanvas.focus({ preventScroll: true }); stageHit(e); });
+liveText.addEventListener("pointerdown", (e) => stageHit(e, liveText));
+function keyHandler(down) {
+  return (e) => {
+    if (e.target.closest && e.target.closest("select, input, textarea")) return;
+    const k = e.key;
+    if (k === "ArrowLeft" || k === "ArrowRight") {
+      const dir = k === "ArrowRight" ? 1 : -1;
+      const name = dir > 0 ? "right" : "left";
+      if (down && !keys[name]) {
+        keys[name] = true;
+        live.walkHeld(dir, () => keys[name], e.shiftKey);
+      } else if (!down) keys[name] = false;
+      e.preventDefault();
+    } else if (k === " " && down) {
+      live.jump(keys.right ? 1 : keys.left ? -1 : 0);
+      e.preventDefault();
+    }
+  };
+}
+liveCanvas.addEventListener("keydown", keyHandler(true));
+liveCanvas.addEventListener("keyup", keyHandler(false));
+document.getElementById("live-render").onchange = (e) => { liveRender = e.target.value; drawLive(); };
+{
+  const box = document.getElementById("act-groups");
+  const LABEL = { basics: "Basics", play: "Play", weather: "Weather & time", work: "Work & feelings" };
+  for (const [group, list] of Object.entries(live.acts)) {
+    if (!list.length) continue;
+    const row = document.createElement("div");
+    row.className = "act-row";
+    row.innerHTML = `<span class="ctl">${LABEL[group] ?? group}</span>`;
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    for (const a of list) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = a.title;
+      b.title = a.description;
+      b.onclick = () => { live.play(a.id); liveCanvas.focus({ preventScroll: true }); };
+      chips.appendChild(b);
+    }
+    row.appendChild(chips);
+    box.appendChild(row);
+  }
+}
+sizeLive();
+if (!reduce) live.play("hello");
+drawLive();
 
 // facts
 const totalFrames = DATA.scenes.reduce((s, sc) => s + Object.values(sc.timelines).reduce((a, t) => a + t.seq.length, 0), 0);
@@ -391,7 +518,7 @@ document.getElementById("facts").innerHTML = [
   `<span class="fact"><b>16</b> masks → glyphs</span>`,
   `<span class="fact"><b>≤2</b> colors per cell, solved</span>`,
   `<span class="fact"><b>DEC 2026</b> synced frames</span>`,
-  `<span class="fact"><b>${DATA.scenes.length}</b> scenes &amp; rigs · <b>${totalFrames}</b> frames</span>`,
+  `<span class="fact"><b>${DATA.scenes.filter((x) => x.kind === "act").length}</b> recorded acts · <b>${totalFrames}</b> frames</span>`,
 ].join("");
 document.getElementById("foot-count").textContent = `${DATA.scenes.length} scenes and rigs, ${totalFrames} timeline frames, built ${DATA.built}`;
 
@@ -413,7 +540,7 @@ function selectScene(scene, timeline) {
   state.prevLines = null;
   state.lastIdx = -1;
   state.focus = null;
-  for (const b of tabs.children) b.setAttribute("aria-selected", String(b.dataset.id === scene.id));
+  for (const b of tabs.querySelectorAll(".tab")) b.setAttribute("aria-selected", String(b.dataset.id === scene.id));
   document.getElementById("term-title").textContent = `${scene.title} — ${scene.kind === "rig" ? "rig" : "scene"}`;
   document.getElementById("term-size").textContent = `${scene.cols}×${scene.rows} cells · ${scene.cols * 2}×${scene.rows * 2} sub-px`;
   document.getElementById("desc").textContent = scene.description;
@@ -555,7 +682,16 @@ document.getElementById("copy").onclick = async (e) => {
   setTimeout(() => (btn.textContent = "Copy frame as printf"), 1800);
 };
 
+const KIND_LABEL = { act: "Pip's acts", scene: "Engine demos", rig: "Rigs" };
+let lastKind = null;
 for (const s of DATA.scenes) {
+  if (s.kind !== lastKind) {
+    const l = document.createElement("span");
+    l.className = "tab-group";
+    l.textContent = KIND_LABEL[s.kind] ?? s.kind;
+    tabs.appendChild(l);
+    lastKind = s.kind;
+  }
   const b = document.createElement("button");
   b.type = "button";
   b.className = "tab";
@@ -598,15 +734,19 @@ for (const s of DATA.scenes.filter((x) => x.kind === "rig")) {
 
 // ---------- loop ----------
 let last = performance.now();
+let liveAcc = 0;
 function tick(now) {
   const dt = Math.min(250, now - last);
   last = now;
+  liveAcc += dt;
+  let stepped = false;
+  while (liveAcc >= live.TICK_MS) {
+    liveAcc -= live.TICK_MS;
+    live.step();
+    stepped = true;
+  }
+  if (stepped) drawLive();
   if (!reduce) {
-    if (heroClip.advance(dt) || heroClip.lastDrawn === undefined) {
-      heroCtx.setTransform(1, 0, 0, 1, 0, 0);
-      drawFrame(heroCtx, heroScene, heroClip.frame, heroCw, { mode: "truecolor" });
-      heroClip.lastDrawn = heroClip.i;
-    }
     if (state.playing && state.clip.advance(dt * state.speed)) renderStage(false);
     for (const a of actors) {
       a.clip.advance(dt);
@@ -618,9 +758,8 @@ function tick(now) {
   }
   requestAnimationFrame(tick);
 }
-drawFrame(heroCtx, heroScene, heroClip.frame, heroCw, { mode: "truecolor" });
 for (const a of actors) drawFrame(a.ctx, a.s, a.clip.frame, a.cw, { mode: "truecolor" });
-selectScene(DATA.scenes.find((s) => s.id === "runner") || DATA.scenes[0]);
-addEventListener("resize", () => { resizeStage(); renderStage(true); });
+selectScene(DATA.scenes.find((s) => s.kind === "act") || DATA.scenes[0]);
+addEventListener("resize", () => { resizeStage(); renderStage(true); sizeLive(); drawLive(); });
 requestAnimationFrame(tick);
 </script>

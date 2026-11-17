@@ -135,7 +135,7 @@ export function makeScene({ name, title, description, cols, rows, palette: pal, 
     const base = compileGridToFrame(f.canvas.px, p);
     folded += base.warnings.length;
     const frame = applyOverlays(base, f.overlays ?? [], p);
-    return { pose: "frame", hold: f.hold ?? 1, durationMs: (f.hold ?? 1) * tickMs, frame };
+    return { pose: "frame", hold: f.hold ?? 1, durationMs: (f.hold ?? 1) * tickMs, frame, folds: base.warnings };
   });
   const rig = {
     name,

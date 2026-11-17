@@ -25,8 +25,10 @@ Commands
   preview    Play a timeline in this terminal. [--timeline NAME] [--loops N]
   show       Print every pose (or --pose NAME) once, colored.
   inspect    Print sub-pixel grids split into 2x2 cells beside the glyphs.
-  demo       Play the showcase here: title card, Pip's run, physics, widgets,
-             fire, resolution comparison, then every rig. [--scene a,b] [--seconds N]
+  demo       Play the showcase here: title, every Pip act, engine demos, rigs.
+             [--scene act-or-scene,...] [--seconds N]
+  play       Pip live in this terminal: ←/→ walk, Shift run, Space jump,
+             Enter poke, 1-9 acts, q quit.
   caps       Print detected terminal capabilities.
   (compile also takes --scene NAME instead of --input to export a procedural scene)
 `;
@@ -196,10 +198,13 @@ switch (command) {
   case "demo": {
     // The whole show in this terminal: procedural scenes, then the cast.
     const { buildScenes, buildCast, SCENES } = await import("./scenes/index.mjs");
-    const order = values.scene ? values.scene.split(",") : ["logo", "runner", "physics", "widgets", "fire", "resolution"];
+    const order = values.scene ? values.scene.split(",") : ["logo", "resolution", "physics", "widgets", "fire"];
     const seconds = values.seconds ? Number(values.seconds) : 6;
     const caps = await detectCapabilitiesAsync();
-    const shows = [...buildScenes(order.filter((n) => SCENES[n])), ...(values.scene ? [] : buildCast())];
+    const { buildActs } = await import("./stage/index.mjs");
+    const { ACTS } = await import("./stage/acts.mjs");
+    const actIds = values.scene ? values.scene.split(",").filter((n) => ACTS[n]) : Object.keys(ACTS);
+    const shows = [...(values.scene ? [] : buildScenes(["logo"])), ...buildActs(actIds), ...buildScenes(order.filter((n) => SCENES[n] && (values.scene || n !== "logo"))), ...(values.scene ? [] : buildCast())];
     const dim = (s) => (caps.noColor || !caps.isTTY ? s : `\x1b[2m${s}\x1b[0m`);
     for (const show of shows) {
       const tlName = show.rig.defaultTimeline;
@@ -212,7 +217,8 @@ switch (command) {
         player.draw(show.poses[show.rig.reducedMotionPose] ?? tl.frames[0].frame);
       } else {
         try {
-          await player.play(tlName, { loops: tl.loop ? Math.max(1, Math.round((seconds * 1000) / pass)) : 1 });
+          const isAct = Boolean(show.meta);
+          await player.play(tlName, { loops: isAct ? 1 : tl.loop ? Math.max(1, Math.round((seconds * 1000) / pass)) : 1 });
           // A scene whose pass ends empty (the title card) settles on its still frame.
           const lastCells = tl.frames.at(-1).frame.cells.flat().filter((c) => c.glyph.trim()).length;
           if (lastCells < 4) player.draw(show.poses[show.rig.reducedMotionPose]);
@@ -222,6 +228,11 @@ switch (command) {
       }
       console.log("");
     }
+    break;
+  }
+  case "play": {
+    const { playInTerminal } = await import("./stage/terminal-play.mjs");
+    await playInTerminal();
     break;
   }
   case "caps":

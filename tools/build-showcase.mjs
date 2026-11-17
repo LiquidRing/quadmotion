@@ -6,13 +6,15 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join, dirname } from "node:path";
 import { buildScenes, buildCast } from "../src/scenes/index.mjs";
+import { buildActs } from "../src/stage/index.mjs";
+import { execFileSync } from "node:child_process";
 import { generateSvg } from "../src/adapters/svg-smil.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const args = process.argv.slice(2);
 const artifactOut = args.includes("--artifact") ? args[args.indexOf("--artifact") + 1] : null;
 
-const ORDER = ["runner", "physics", "widgets", "fire", "resolution", "logo"];
+const ORDER = ["resolution", "physics", "widgets", "fire", "logo"];
 
 function encodeFrame(frame) {
   return frame.cells.map((line) =>
@@ -62,13 +64,21 @@ function encode(compiled, kind) {
 
 const scenes = buildScenes(ORDER);
 const cast = buildCast();
+const acts = buildActs();
 const data = {
   built: new Date().toISOString().slice(0, 10),
-  scenes: [...scenes.map((s) => encode(s, "scene")), ...cast.map((c) => encode(c, "rig"))],
+  scenes: [...acts.map((a) => encode(a, "act")), ...scenes.map((s) => encode(s, "scene")), ...cast.map((c) => encode(c, "rig"))],
 };
 
+// The live stage: bundle the world, puppet and acts for the browser (bun).
+const bundleFile = join(root, "records", "stage.bundle.js");
+mkdirSync(dirname(bundleFile), { recursive: true });
+execFileSync("bun", ["build", join(root, "src", "stage", "browser-global.mjs"), "--format", "iife", "--target", "browser", "--minify", "--outfile", bundleFile], { stdio: "inherit" });
+const bundle = readFileSync(bundleFile, "utf8").replace(/<\/script/gi, "<\\/script");
 const template = readFileSync(join(root, "tools", "showcase-template.html"), "utf8");
-const body = template.replace("/*__DATA__*/null", JSON.stringify(data));
+const MARK = "<script>\nconst DATA = /*__DATA__*/null;";
+const body = template.replace(MARK, () => `<script>${bundle}</script>\n<script>\nconst DATA = ${JSON.stringify(data)};`);
+if (body === template) throw new Error("template markers not found");
 const page = `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n${body}\n</body>\n</html>\n`;
 const out = join(root, "docs", "showcase", "index.html");
 mkdirSync(dirname(out), { recursive: true });
@@ -82,9 +92,10 @@ if (artifactOut) {
 // README media: one animated SVG per scene and per rig's default timeline.
 const media = join(root, "docs", "media");
 mkdirSync(media, { recursive: true });
-for (const s of [...scenes, ...cast]) {
+mkdirSync(join(media, "acts"), { recursive: true });
+for (const s of [...acts, ...scenes, ...cast]) {
   const svg = generateSvg(s, { timeline: s.rig.defaultTimeline, scale: s.rig.cols > 30 ? 8 : 12, background: "#0e1016" });
-  const file = join(media, `${s.rig.name}.svg`);
+  const file = acts.includes(s) ? join(media, "acts", `${s.rig.name}.svg`) : join(media, `${s.rig.name}.svg`);
   writeFileSync(file, svg);
   console.log(`wrote ${file} (${(svg.length / 1024).toFixed(0)} KB)`);
 }

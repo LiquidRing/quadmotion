@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { compileRig } from "../core/pipeline.mjs";
 import { logoScene } from "./logo.mjs";
-import { runnerScene } from "./runner.mjs";
 import { resolutionScene } from "./resolution.mjs";
 import { physicsScene } from "./physics.mjs";
 import { widgetsScene } from "./widgets.mjs";
@@ -13,7 +12,6 @@ import { fireScene } from "./fire.mjs";
 
 export const SCENES = {
   logo: logoScene,
-  runner: runnerScene,
   resolution: resolutionScene,
   physics: physicsScene,
   widgets: widgetsScene,
