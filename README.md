@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/media/acts/hello.svg" alt="Pip skips in and waves hello, drawn entirely with Unicode quadrant characters" width="100%"></p>
+<p align="center"><img src="docs/media/quadmotion-reel.gif" alt="QuadMotion reel: Pip walks, jumps, kicks a ball, sneezes, opens an umbrella in the rain, sleeps, types and trips, all drawn with Unicode quadrant characters" width="100%"></p>
 
 <h1 align="center">QuadMotion</h1>
 
@@ -7,7 +7,7 @@
 <p align="center">Every frame is real text: Unicode quadrant characters <code>▘▝▀▖▌▞▛▗▚▐▜▄▙▟█</code>, two colors per cell, redrawn without flicker.<br>
 Zero dependencies · Node 20+ · ANSI · Ink · Claude Code mods · SVG</p>
 
-<p align="center"><b>English</b> · <a href="README.ru.md">Русский</a> · <a href="docs/media/quadmotion-reel.gif">65-second reel (GIF)</a></p>
+<p align="center"><b>English</b> · <a href="README.ru.md">Русский</a> · <a href="docs/media/quadmotion-reel.mp4">reel in MP4</a></p>
 
 ---
 
@@ -55,9 +55,9 @@ settle.
 
 And the quick reactions, Clawd-style: what a click on Pip triggers, plus his idle life.
 
-| <img src="docs/media/acts/click-hops.svg" width="100%" alt="Happy hops"> | <img src="docs/media/acts/look-around.svg" width="100%" alt="Look around and double take"> | <img src="docs/media/acts/spin.svg" width="100%" alt="Spin"> | <img src="docs/media/acts/idle-life.svg" width="100%" alt="Idle breathing and blinking"> |
-| :---: | :---: | :---: | :---: |
-| Happy hops | Look around | Spin | Idle life |
+| <img src="docs/media/acts/hello.svg" width="100%" alt="Skip in and wave hello"> | <img src="docs/media/acts/click-hops.svg" width="100%" alt="Happy hops"> | <img src="docs/media/acts/look-around.svg" width="100%" alt="Look around and double take"> | <img src="docs/media/acts/spin.svg" width="100%" alt="Spin"> | <img src="docs/media/acts/idle-life.svg" width="100%" alt="Idle breathing and blinking"> |
+| :---: | :---: | :---: | :---: | :---: |
+| Hello | Happy hops | Look around | Spin | Idle life |
 
 **Play with him.** In a terminal:
 

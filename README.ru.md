@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/media/acts/ru/hello.svg" alt="Pip вбегает вприпрыжку и машет рукой, нарисованный одними квадрантными символами Unicode" width="100%"></p>
+<p align="center"><img src="docs/media/quadmotion-reel.gif" alt="Ролик QuadMotion: Pip ходит, прыгает, бьёт по мячу, чихает, раскрывает зонт под дождём, спит, печатает и спотыкается — всё квадрантными символами Unicode" width="100%"></p>
 
 <h1 align="center">QuadMotion</h1>
 
@@ -7,7 +7,7 @@
 <p align="center">Каждый кадр — настоящий текст: квадрантные символы Unicode <code>▘▝▀▖▌▞▛▗▚▐▜▄▙▟█</code>, два цвета на ячейку, перерисовка без мерцания.<br>
 Без зависимостей · Node 20+ · ANSI · Ink · моды Claude Code · SVG</p>
 
-<p align="center"><a href="README.md">English</a> · <b>Русский</b> · <a href="docs/media/quadmotion-reel.gif">ролик на 65 секунд (GIF)</a></p>
+<p align="center"><a href="README.md">English</a> · <b>Русский</b> · <a href="docs/media/quadmotion-reel.mp4">ролик в MP4</a></p>
 
 ---
 
@@ -55,9 +55,9 @@ Pip — маскот проекта и его доказательство. Он
 
 И короткие реакции в духе Clawd — то, что делает клик по Pip, плюс его жизнь в покое.
 
-| <img src="docs/media/acts/ru/click-hops.svg" width="100%" alt="Подпрыгивания"> | <img src="docs/media/acts/ru/look-around.svg" width="100%" alt="Осмотр и двойной взгляд"> | <img src="docs/media/acts/ru/spin.svg" width="100%" alt="Вертушка"> | <img src="docs/media/acts/ru/idle-life.svg" width="100%" alt="Дыхание и моргание"> |
-| :---: | :---: | :---: | :---: |
-| Подпрыгивания | Осмотр | Вертушка | Покой |
+| <img src="docs/media/acts/ru/hello.svg" width="100%" alt="Вбегает и машет рукой"> | <img src="docs/media/acts/ru/click-hops.svg" width="100%" alt="Подпрыгивания"> | <img src="docs/media/acts/ru/look-around.svg" width="100%" alt="Осмотр и двойной взгляд"> | <img src="docs/media/acts/ru/spin.svg" width="100%" alt="Вертушка"> | <img src="docs/media/acts/ru/idle-life.svg" width="100%" alt="Дыхание и моргание"> |
+| :---: | :---: | :---: | :---: | :---: |
+| Привет | Подпрыгивания | Осмотр | Вертушка | Покой |
 
 **Поиграйте с ним.** В терминале:
 
