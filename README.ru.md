@@ -76,9 +76,6 @@ node src/cli.mjs play
 следует открытому стандарту [Agent Skills](https://agentskills.io) и работает в
 любом совместимом агенте. Скилл самодостаточен: Node 20+, без `npm install`.
 
-> Пока репозиторий приватный, для любого способа ниже нужен доступ к нему на
-> GitHub (например, `gh auth login`).
-
 **Любой агент, через CLI [`skills`](https://github.com/vercel-labs/skills)**:
 
 ```bash
@@ -253,16 +250,15 @@ npm run build
 
 ## Статус
 
-Версия 0.2, пока приватная. В планах:
+Версия 0.2. В планах:
 - публикация в npm, чтобы работал `npx quadmotion play`;
-- открытый репозиторий;
 - новые сценки;
 - парные eval-прогоны скилла ([`skill-src/evals/evals.json`](skill-src/evals/evals.json)).
 
 ## Благодарности
 
 Техника выросла из разбора того, как нарисован и анимирован маскот Claude
-Code: заметки в [`Техника Анимации Маскота Clawd.md`](Техника%20Анимации%20Маскота%20Clawd.md).
+Code: заметки в [`docs/research/clawd-mascot-technique.ru.md`](docs/research/clawd-mascot-technique.ru.md).
 Ассетов Anthropic в проекте нет: Pip и остальные персонажи оригинальные и под
 MIT. Метод «смотри на свои кадры» — по подходу Хьюго Дюпре к пиксельным
 эффектам с ИИ ([pixelfx](https://github.com/patch-gg/pixelfx)).

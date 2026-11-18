@@ -77,9 +77,6 @@ QuadMotion. It follows the open [Agent Skills](https://agentskills.io)
 standard and works in any compatible agent. It is self-contained: Node 20+,
 no npm install.
 
-> The repository is private for now. Every method below needs your GitHub
-> access (for example `gh auth login`) until it is public.
-
 **Any agent, with the [`skills`](https://github.com/vercel-labs/skills) CLI**:
 
 ```bash
@@ -260,10 +257,9 @@ with `strip --act <id>`, look at it, and make `npm test` pass.
 
 ## Status
 
-Version 0.2, private while it settles. Planned:
+Version 0.2. Planned:
 
 - publish to npm, so `npx quadmotion play` works;
-- make the repository public;
 - add more acts;
 - run the skill's paired evals ([`skill-src/evals/evals.json`](skill-src/evals/evals.json)).
 
@@ -271,7 +267,7 @@ Version 0.2, private while it settles. Planned:
 
 The technique comes from studying how Claude Code's mascot is drawn and
 animated; the notes are in
-[`Техника Анимации Маскота Clawd.md`](Техника%20Анимации%20Маскота%20Clawd.md)
+[`docs/research/clawd-mascot-technique.ru.md`](docs/research/clawd-mascot-technique.ru.md)
 (Russian). No Anthropic assets are included. Pip and every other character are
 original and MIT-licensed. The look-at-your-frames method follows Hugo
 Duprez's approach to pixel effects with AI ([pixelfx](https://github.com/patch-gg/pixelfx)).
