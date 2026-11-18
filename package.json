@@ -34,7 +34,8 @@
     "build": "node tools/build-skill.mjs && node tools/build-showcase.mjs",
     "demo": "node src/cli.mjs demo",
     "preview": "node src/cli.mjs preview --input assets/pip.rig.json",
-    "validate": "node src/cli.mjs validate --input assets/pip.rig.json"
+    "validate": "node src/cli.mjs validate --input assets/pip.rig.json",
+    "reel": "node tools/reel.mjs"
   },
   "peerDependencies": {
     "ink": ">=4",

@@ -7,7 +7,7 @@
 <p align="center">Каждый кадр — настоящий текст: квадрантные символы Unicode <code>▘▝▀▖▌▞▛▗▚▐▜▄▙▟█</code>, два цвета на ячейку, перерисовка без мерцания.<br>
 Без зависимостей · Node 20+ · ANSI · Ink · моды Claude Code · SVG</p>
 
-<p align="center"><a href="README.md">English</a> · <b>Русский</b></p>
+<p align="center"><a href="README.md">English</a> · <b>Русский</b> · <a href="docs/media/quadmotion-reel.gif">ролик на 65 секунд (GIF)</a></p>
 
 ---
 

@@ -7,7 +7,7 @@
 <p align="center">Every frame is real text: Unicode quadrant characters <code>▘▝▀▖▌▞▛▗▚▐▜▄▙▟█</code>, two colors per cell, redrawn without flicker.<br>
 Zero dependencies · Node 20+ · ANSI · Ink · Claude Code mods · SVG</p>
 
-<p align="center"><b>English</b> · <a href="README.ru.md">Русский</a></p>
+<p align="center"><b>English</b> · <a href="README.ru.md">Русский</a> · <a href="docs/media/quadmotion-reel.gif">65-second reel (GIF)</a></p>
 
 ---
 

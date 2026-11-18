@@ -3,6 +3,7 @@
 // animation frame by frame, and by tests.
 
 import { deflateSync } from "node:zlib";
+import { FONT5 } from "./font5x7.mjs";
 
 const CRC_TABLE = (() => {
   const t = new Uint32Array(256);
@@ -76,7 +77,8 @@ export class Raster {
 
 /**
  * Draw one compiled frame at (ox, oy). cw = cell width in px (cell height = 2*cw).
- * Overlay glyphs: shades are dithered, anything else is a small block in its color.
+ * Overlay glyphs: shades are dithered, letters use the 5x7 font, anything
+ * else is a small block in its color.
  */
 export function drawFrame(raster, frame, palette, ox, oy, cw = 6, opts = {}) {
   cw = Math.max(2, Math.round(cw / 2) * 2); // even, so quadrants are whole pixels
@@ -99,6 +101,11 @@ export function drawFrame(raster, frame, palette, ox, oy, cw = 6, opts = {}) {
         const c2 = fg ?? [210, 214, 230];
         if (s) {
           for (let j = 0; j < ch; j++) for (let i = 0; i < cw; i++) if (((i * 7 + j * 3) % 4) / 4 < s) raster.fill(x + i, y + j, 1, 1, c2);
+        } else if (FONT5[cell.glyph.toUpperCase()] && cw >= 5) {
+          const sc = Math.max(1, Math.floor(cw / 5));
+          const gx = x + Math.floor((cw - 5 * sc) / 2);
+          const gy = y + Math.floor((ch - 7 * sc) / 2);
+          FONT5[cell.glyph.toUpperCase()].forEach((row, j) => [...row].forEach((p, i) => p === "#" && raster.fill(gx + i * sc, gy + j * sc, sc, sc, c2)));
         } else if (cell.glyph.trim()) {
           raster.fill(x + Math.floor(cw / 4), y + Math.floor(ch / 3), Math.ceil(cw / 2), Math.ceil(ch / 3), c2);
         }
