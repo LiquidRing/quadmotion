@@ -92,7 +92,11 @@ if (artifactOut) {
 // README media: one animated SVG per scene and per rig's default timeline.
 const media = join(root, "docs", "media");
 mkdirSync(media, { recursive: true });
-mkdirSync(join(media, "acts"), { recursive: true });
+mkdirSync(join(media, "acts", "ru"), { recursive: true });
+// Russian README: the same acts with Russian speech.
+for (const s of buildActs(undefined, { lang: "ru" })) {
+  writeFileSync(join(media, "acts", "ru", `${s.rig.name}.svg`), generateSvg(s, { timeline: s.rig.defaultTimeline, scale: 8, background: "#0e1016" }));
+}
 // README uses every act, the resolution comparison and the rigs.
 for (const s of [...acts, ...scenes.filter((x) => x.rig.name === "resolution"), ...cast]) {
   const svg = generateSvg(s, { timeline: s.rig.defaultTimeline, scale: s.rig.cols > 30 ? 8 : 12, background: "#0e1016" });

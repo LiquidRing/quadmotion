@@ -87,7 +87,7 @@ export const ACTS = {
     at: at([
       [0, (w) => w.pip.do(wait, 10).do(walkTo, 38, { speed: 0.6 })],
       [1, (w) => w.pip.do(wait, 4).do(pose, { look: 2 }, 6).do(pose, { eyes: "blink" }, 2).do(pose, { eyes: "open" }, 3).do(jump, { dx: 50, height: 9 })],
-      [2, (w) => w.pip.do(wait, 4).do(pose, { look: -3 }, 8).do(pose, { look: 0 }, 2).do(wave, { text: "Хоп!", times: 2 }).do(walkTo, 140, { speed: 0.9 })],
+      [2, (w) => w.pip.do(wait, 4).do(pose, { look: -3 }, 8).do(pose, { look: 0 }, 2).do(wave, { text: "Hop!", times: 2 }).do(walkTo, 140, { speed: 0.9 })],
     ]),
     run(w) {
       const dir = w.pip.x < w.W / 2 ? 1 : -1;
@@ -95,7 +95,7 @@ export const ACTS = {
       w.props = w.props.filter((p) => p.kind !== "crate");
       w.props.push(new Crate(dir > 0 ? crateX : crateX - 8));
       w.pip.facing = dir;
-      w.pip.do(pose, { look: 2 }, 6).do(pose, { eyes: "blink" }, 2).do(pose, { eyes: "open" }, 2).do(jump, { dx: dir * 44, height: 9 }).do(wave, { text: "Хоп!", times: 2 });
+      w.pip.do(pose, { look: 2 }, 6).do(pose, { eyes: "blink" }, 2).do(pose, { eyes: "open" }, 2).do(jump, { dx: dir * 44, height: 9 }).do(wave, { text: "Hop!", times: 2 });
     },
   },
 
@@ -106,9 +106,9 @@ export const ACTS = {
     setup(w) {
       w.pip.x = -16;
     },
-    at: at([[0, (w) => w.pip.do(skipIn, { to: 44 }).do(wave, { text: "Привет!", times: 3 })]]),
+    at: at([[0, (w) => w.pip.do(skipIn, { to: 44 }).do(wave, { text: "Hi!", times: 3 })]]),
     run(w) {
-      w.pip.do(wave, { text: "Привет!", times: 3 });
+      w.pip.do(wave, { text: "Hi!", times: 3 });
     },
   },
 

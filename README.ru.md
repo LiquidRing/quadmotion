@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/media/acts/hello.svg" alt="Pip вбегает вприпрыжку и машет рукой, нарисованный одними квадрантными символами Unicode" width="100%"></p>
+<p align="center"><img src="docs/media/acts/ru/hello.svg" alt="Pip вбегает вприпрыжку и машет рукой, нарисованный одними квадрантными символами Unicode" width="100%"></p>
 
 <h1 align="center">QuadMotion</h1>
 
@@ -45,17 +45,17 @@ Pip — маскот проекта и его доказательство. Он
 
 | | |
 | :---: | :---: |
-| <img src="docs/media/acts/walk-jump.svg" width="100%" alt="Pip идёт, смотрит на ящик, приседает и перепрыгивает"><br>**Ходьба и прыжок**: шаг с опорными ступнями, взгляд, присед, дуга, приземление с пылью | <img src="docs/media/acts/ball-kick.svg" width="100%" alt="Pip бьёт по мячу"><br>**Мяч**: следит глазами, замах, удар с задержкой на контакте, «Гол!» |
-| <img src="docs/media/acts/catch-apple.svg" width="100%" alt="Pip ловит яблоко и ест его"><br>**Яблоко**: замечает, подстраивается мелкими шагами, ловит, три укуса | <img src="docs/media/acts/butterfly.svg" width="100%" alt="Бабочка садится на лампочку, Pip чихает"><br>**Бабочка**: садится на лампочку, глаза в кучку, громкий чих |
-| <img src="docs/media/acts/rain.svg" width="100%" alt="Дождь, зонт и лужа"><br>**Дождь**: первая капля по лампочке, зонт раскрывается по шагам, прыжок в лужу | <img src="docs/media/acts/night.svg" width="100%" alt="Наступает ночь, Pip спит"><br>**Ночь**: звёзды по одной, зевок, «z Z z», утреннее потягивание |
-| <img src="docs/media/acts/typing.svg" width="100%" alt="Pip печатает на ноутбуке"><br>**Работа**: печатает, думает, прогресс, «✓» — так выглядит вызов инструмента | <img src="docs/media/acts/oops.svg" width="100%" alt="Pip спотыкается и падает"><br>**Ошибка**: спотыкается, падает плашмя с глазами x_x, звёздочки, встаёт |
-| <img src="docs/media/acts/push-crate.svg" width="100%" alt="Pip толкает тяжёлый ящик"><br>**Тяжёлый ящик**: упирается, пыхтит, ящик едет рывками | <img src="docs/media/acts/balloon.svg" width="100%" alt="Шарик поднимает Pip"><br>**Шарик**: хватает за нитку, взлетает, отпускает, машет вслед |
-| <img src="docs/media/acts/success.svg" width="100%" alt="Конфетти и поклон"><br>**Успех**: конфетти, прыжок, поклон | <img src="docs/media/acts/eureka.svg" width="100%" alt="Лампочка Pip вспыхивает идеей"><br>**Эврика**: чешет голову, лампочка вспыхивает |
-| <img src="docs/media/acts/snow.svg" width="100%" alt="На Pip наметает снег"><br>**Снег**: на голове растёт шапка снега, он её стряхивает | <img src="docs/media/acts/fireflies.svg" width="100%" alt="Светлячки отвечают лампочке"><br>**Светлячки**: мигает лампочкой, они мигают в ответ |
+| <img src="docs/media/acts/ru/walk-jump.svg" width="100%" alt="Pip идёт, смотрит на ящик, приседает и перепрыгивает"><br>**Ходьба и прыжок**: шаг с опорными ступнями, взгляд, присед, дуга, приземление с пылью | <img src="docs/media/acts/ru/ball-kick.svg" width="100%" alt="Pip бьёт по мячу"><br>**Мяч**: следит глазами, замах, удар с задержкой на контакте, «Гол!» |
+| <img src="docs/media/acts/ru/catch-apple.svg" width="100%" alt="Pip ловит яблоко и ест его"><br>**Яблоко**: замечает, подстраивается мелкими шагами, ловит, три укуса | <img src="docs/media/acts/ru/butterfly.svg" width="100%" alt="Бабочка садится на лампочку, Pip чихает"><br>**Бабочка**: садится на лампочку, глаза в кучку, громкий чих |
+| <img src="docs/media/acts/ru/rain.svg" width="100%" alt="Дождь, зонт и лужа"><br>**Дождь**: первая капля по лампочке, зонт раскрывается по шагам, прыжок в лужу | <img src="docs/media/acts/ru/night.svg" width="100%" alt="Наступает ночь, Pip спит"><br>**Ночь**: звёзды по одной, зевок, «z Z z», утреннее потягивание |
+| <img src="docs/media/acts/ru/typing.svg" width="100%" alt="Pip печатает на ноутбуке"><br>**Работа**: печатает, думает, прогресс, «✓» — так выглядит вызов инструмента | <img src="docs/media/acts/ru/oops.svg" width="100%" alt="Pip спотыкается и падает"><br>**Ошибка**: спотыкается, падает плашмя с глазами x_x, звёздочки, встаёт |
+| <img src="docs/media/acts/ru/push-crate.svg" width="100%" alt="Pip толкает тяжёлый ящик"><br>**Тяжёлый ящик**: упирается, пыхтит, ящик едет рывками | <img src="docs/media/acts/ru/balloon.svg" width="100%" alt="Шарик поднимает Pip"><br>**Шарик**: хватает за нитку, взлетает, отпускает, машет вслед |
+| <img src="docs/media/acts/ru/success.svg" width="100%" alt="Конфетти и поклон"><br>**Успех**: конфетти, прыжок, поклон | <img src="docs/media/acts/ru/eureka.svg" width="100%" alt="Лампочка Pip вспыхивает идеей"><br>**Эврика**: чешет голову, лампочка вспыхивает |
+| <img src="docs/media/acts/ru/snow.svg" width="100%" alt="На Pip наметает снег"><br>**Снег**: на голове растёт шапка снега, он её стряхивает | <img src="docs/media/acts/ru/fireflies.svg" width="100%" alt="Светлячки отвечают лампочке"><br>**Светлячки**: мигает лампочкой, они мигают в ответ |
 
 И короткие реакции в духе Clawd — то, что делает клик по Pip, плюс его жизнь в покое.
 
-| <img src="docs/media/acts/click-hops.svg" width="100%" alt="Подпрыгивания"> | <img src="docs/media/acts/look-around.svg" width="100%" alt="Осмотр и двойной взгляд"> | <img src="docs/media/acts/spin.svg" width="100%" alt="Вертушка"> | <img src="docs/media/acts/idle-life.svg" width="100%" alt="Дыхание и моргание"> |
+| <img src="docs/media/acts/ru/click-hops.svg" width="100%" alt="Подпрыгивания"> | <img src="docs/media/acts/ru/look-around.svg" width="100%" alt="Осмотр и двойной взгляд"> | <img src="docs/media/acts/ru/spin.svg" width="100%" alt="Вертушка"> | <img src="docs/media/acts/ru/idle-life.svg" width="100%" alt="Дыхание и моргание"> |
 | :---: | :---: | :---: | :---: |
 | Подпрыгивания | Осмотр | Вертушка | Покой |
 

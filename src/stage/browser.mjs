@@ -16,21 +16,26 @@ const REACTIONS = [
   (p) => p.do(lookAround),
   (p) => p.do(spin),
   (p) => p.do(doubleTake, { side: p.facing }),
-  (p) => p.do(wave, { text: "Привет!", times: 2 }),
+  (p) => p.do(wave, { text: "Hi!", times: 2 }),
 ];
 
-export function createLive({ seed = 11, cols = 64, rows = 12 } = {}) {
+export function createLive({ seed = 11, cols = 64, rows = 12, lang = "en" } = {}) {
   const issues = [];
   const { palette } = normalizePalette(paletteSpec({ ...STAGE_PALETTE, ...GROUP_PALETTE }), issues);
   let world;
   const reset = () => {
-    world = new World({ cols, rows, seed });
+    world = new World({ cols, rows, seed, lang });
     world.pip.x = Math.round(world.W / 2 / 2) * 2;
   };
   reset();
   let reactionIndex = 0;
   const api = {
     TICK_MS,
+    /** Change the speech language live ("en", "ru"). */
+    setLang(l) {
+      lang = l;
+      world.lang = l;
+    },
     palette,
     get world() {
       return world;

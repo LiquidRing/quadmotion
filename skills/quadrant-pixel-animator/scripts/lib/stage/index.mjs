@@ -38,8 +38,8 @@ export const STAGE_PALETTE = {
 };
 
 /** Run an act script and record every tick. */
-export function recordAct(act) {
-  const world = new World({ cols: act.cols ?? 64, rows: act.rows ?? 12, seed: act.seed ?? 7 });
+export function recordAct(act, { lang = "en" } = {}) {
+  const world = new World({ cols: act.cols ?? 64, rows: act.rows ?? 12, seed: act.seed ?? 7, lang });
   act.setup?.(world);
   const frames = [];
   const meta = [];
@@ -73,10 +73,10 @@ export function recordAct(act) {
   return scene;
 }
 
-export function buildActs(ids = Object.keys(ACTS)) {
+export function buildActs(ids = Object.keys(ACTS), { lang = "en" } = {}) {
   return ids.map((id) => {
     const act = ACTS[id];
     if (!act) throw new Error(`Unknown act "${id}". Known: ${Object.keys(ACTS).join(", ")}`);
-    return recordAct({ id, ...act });
+    return recordAct({ id, ...act }, { lang });
   });
 }

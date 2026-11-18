@@ -17,8 +17,8 @@ test("starter rig validates without errors or warnings", () => {
 
 test("pose snapshots (code points, no colors)", () => {
   const t = poseTexts(compileRig(pip));
-  assert.deepEqual(t.default, ["  ▄▄▄▄▄  ", " ▟▙███▟▙ ", "  ▀   ▀  "]);
-  assert.deepEqual(t.blink, ["  ▄▄▄▄▄  ", " ▟█████▙ ", "  ▀   ▀  "]);
+  assert.deepEqual(t.default, ["  ▄▄▄▄▄  ", " ▝▙███▟▘ ", "  ▝▘ ▝▘  "]);
+  assert.deepEqual(t.blink, ["  ▄▄▄▄▄  ", " ▝█████▘ ", "  ▝▘ ▝▘  "]);
   assert.deepEqual(t.crouch, ["    ▄    ", " ▟▜███▛▙ ", "▝▀█▀▀▀█▀▘"]);
   assert.deepEqual(t.jump, ["▐▗▛█▄█▜▖▌", " ▀█▀▀▀█▀ ", "         "]);
 });

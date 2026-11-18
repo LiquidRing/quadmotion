@@ -11,6 +11,7 @@
 
 import { Canvas, prng } from "../scenes/kit.mjs";
 import { drawPip } from "./pip.mjs";
+import { tr } from "./i18n.mjs";
 
 export const TICK_MS = 50;
 
@@ -30,7 +31,8 @@ export const NEUTRAL = Object.freeze({
 });
 
 export class World {
-  constructor({ cols = 64, rows = 12, seed = 1, groundRow } = {}) {
+  constructor({ cols = 64, rows = 12, seed = 1, groundRow, lang = "en" } = {}) {
+    this.lang = lang;
     this.cols = cols;
     this.rows = rows;
     this.W = cols * 2;
@@ -95,12 +97,14 @@ export class World {
   }
 
   say(text, ticks = 30, { col, row = 0, fg = "t" } = {}) {
+    text = tr(text, this.lang);
     const width = [...text].length + 2;
     const c = col ?? Math.max(0, Math.min(this.cols - width, Math.round(this.pip.x / 2) - Math.floor(width / 2)));
     this.overlays.push({ text: `‹${text}›`, col: c, row, fg, until: this.t + ticks });
   }
 
   mark(text, ticks, { dx = 0, row, fg = "t" } = {}) {
+    text = tr(text, this.lang);
     const box = this.pip.box;
     const r = row ?? Math.max(0, Math.floor((box?.top ?? 4) / 2) - 1);
     this.overlays.push({ text, col: Math.round(this.pip.x / 2) + dx, row: r, fg, until: this.t + ticks });
@@ -354,7 +358,7 @@ export function* lookAround(pip, w) {
 }
 
 /** Wave hello with a speech bubble. */
-export function* wave(pip, w, { text = "Привет!", times = 3 } = {}) {
+export function* wave(pip, w, { text = "Hi!", times = 3 } = {}) {
   const s = pip.state;
   Object.assign(s, { eyes: "happy", blush: true, mouth: "smile" });
   w.say(text, 8 * times + 6);

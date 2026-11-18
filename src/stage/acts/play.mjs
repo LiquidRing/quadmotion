@@ -264,7 +264,7 @@ function* ballKick(pip, w, ball, S) {
   }
   s.eyes = "open";
   yield* pose(pip, w, { look: 0, lookY: 0, eyes: "happy", mouth: "smile" }, 3);
-  w.say("Гол!", 18);
+  w.say("Goal!", 18);
   yield* happyHops(pip, w, { times: 1 });
 }
 
@@ -390,7 +390,7 @@ function* catchApple(pip, w, apple) {
     else apple.mode = "gone";
     for (const side of [-1, 1]) w.spray(pip.x + side * 13, w.ground - 7, 2, { tok: side === dir ? "0" : "R", dir: side, speed: 0.5, up: 0.7, g: 0.1, life: 8 });
     if (!next) w.spray(pip.x + dir * 13, w.ground - 8, 1, { tok: "G", dir, speed: 0.3, up: 0.6, g: 0.03, life: 20 });
-    w.mark("ням", 5, { dx: dir * 7 });
+    w.mark("nom", 5, { dx: dir * 7 });
     yield* wait(pip, w, 2);
     // chew: a small one-pixel bob, not another chomp
     for (let k = 0; k < 2; k++) {
@@ -402,7 +402,7 @@ function* catchApple(pip, w, apple) {
   w.props = w.props.filter((p) => p !== apple);
   Object.assign(s, { armL: "down", armR: "down", eyes: "happy", mouth: "smile" });
   yield* wait(pip, w, 3);
-  w.say("Вкусно!", 20);
+  w.say("Yum!", 20);
   yield* happyHops(pip, w, { times: 1 });
   // The last beat: a happy blush (no squash poses here: blush + happy eyes on
   // the wide body would share a cell with the eye).
@@ -522,20 +522,20 @@ function* butterflySneeze(pip, w, bf) {
     yield;
   }
   // The sneeze builds: inhale, inhale more.
-  w.say("а..", 9);
+  w.say("ah..", 9);
   Object.assign(s, { body: "b", eyes: "plSquint", mouth: "o", bulb: "glow" });
   yield* wait(pip, w, 4);
   s.bulb = "on";
   yield* wait(pip, w, 5);
-  w.say("а-а..", 9);
+  w.say("ah-ah..", 9);
   Object.assign(s, { body: "t1", legLen: 3, armL: "out", armR: "out", eyes: "closed", mouth: "open", bulb: "glow" });
   yield* wait(pip, w, 4);
   s.bulb = "on";
   yield* wait(pip, w, 5);
   Object.assign(s, { body: "t2", legLen: 3, armL: "up", armR: "up", antenna: -2 * dir, bulb: "glow" });
   yield* wait(pip, w, 4);
-  // АПЧХИ! Big squash, antenna whips forward, spray, dust both sides.
-  w.say("АПЧХИ!", 16);
+  // ACHOO! Big squash, antenna whips forward, spray, dust both sides.
+  w.say("ACHOO!", 16);
   Object.assign(s, { body: "s2", legLen: 0, armL: "back", armR: "back", antenna: 2 * dir, eyes: "closed", mouth: "open", bulb: "on" });
   const g = geom(pip, w);
   w.spray(off(pip.x, dir, 14), g.top + 4, 7, { tok: "1", dir, speed: 1.4, up: 0.5, g: 0.06, life: 10 });
@@ -549,7 +549,7 @@ function* butterflySneeze(pip, w, bf) {
   Object.assign(s, { body: "n", legLen: 2, antenna: 0, eyes: "blink" });
   yield* wait(pip, w, 2);
   // Sniff, embarrassed: two quick sniffs, then a blush and a sheepish look away.
-  w.mark("шмыг", 10, { dx: dir * 7 });
+  w.mark("sniff", 10, { dx: dir * 7 });
   for (let k = 0; k < 2; k++) {
     yield* pose(pip, w, { body: "b", eyes: "plSquint" }, 2);
     yield* pose(pip, w, { body: "n", eyes: "open" }, 2);
@@ -657,7 +657,7 @@ function* balloonRide(pip, w, bal) {
   // It pulls: tiptoe, then the feet leave the ground and dangle.
   Object.assign(s, { eyes: "happy", body: "t2", legLen: 3 });
   yield* wait(pip, w, 3);
-  w.say("Уиии!", 30);
+  w.say("Wheee!", 30);
   Object.assign(s, { body: "n", legLen: 2, armL: "out" });
   const lifts = [1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 1];
   for (let i = 0; i < lifts.length; i++) {
@@ -682,7 +682,7 @@ function* balloonRide(pip, w, bal) {
   yield;
   Object.assign(s, { body: "n", legLen: 2, eyes: "wide", lookY: -1 });
   lookAt(pip, bal.x);
-  w.mark("ой", 10, { dx: dir * 5 });
+  w.mark("oops", 10, { dx: dir * 5 });
   yield* wait(pip, w, 8);
   for (let i = 0; i < 10; i++) {
     lookAt(pip, bal.x + 3);
@@ -690,7 +690,7 @@ function* balloonRide(pip, w, bal) {
     yield;
   }
   yield* settle(pip, w);
-  yield* wave(pip, w, { text: "Пока!", times: 2 });
+  yield* wave(pip, w, { text: "Bye!", times: 2 });
 }
 
 function startBalloon(w, { dir }) {

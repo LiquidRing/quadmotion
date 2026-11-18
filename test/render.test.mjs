@@ -89,5 +89,5 @@ test("reduced motion draws the still pose once", async () => {
   const player = new TerminalPlayer(compiled, { isTTY: false, reducedMotion: true, noColor: true }, { stream: { write: (s) => out.push(s) } });
   await player.play("celebrate");
   assert.equal(out.length, 1);
-  assert.equal(out[0], "  ▄▄▄▄▄  \n ▟▙███▟▙ \n  ▀   ▀  \n");
+  assert.equal(out[0], "  ▄▄▄▄▄  \n ▝▙███▟▘ \n  ▝▘ ▝▘  \n");
 });

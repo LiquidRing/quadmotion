@@ -45,7 +45,7 @@ settle.
 
 | | |
 | :---: | :---: |
-| <img src="docs/media/acts/walk-jump.svg" width="100%" alt="Pip walks, eyes the crate, crouches and jumps over it"><br>**Walk & jump**: planted-foot walk, a look, a crouch, an arc, a landing with dust | <img src="docs/media/acts/ball-kick.svg" width="100%" alt="Pip kicks a ball"><br>**Ball**: eyes track it, wind-up, a kick with a held contact, "Гол!" |
+| <img src="docs/media/acts/walk-jump.svg" width="100%" alt="Pip walks, eyes the crate, crouches and jumps over it"><br>**Walk & jump**: planted-foot walk, a look, a crouch, an arc, a landing with dust | <img src="docs/media/acts/ball-kick.svg" width="100%" alt="Pip kicks a ball"><br>**Ball**: eyes track it, wind-up, a kick with a held contact, "Goal!" |
 | <img src="docs/media/acts/catch-apple.svg" width="100%" alt="Pip catches an apple and eats it"><br>**Apple**: spots it, shuffles under it, catches it, three bites | <img src="docs/media/acts/butterfly.svg" width="100%" alt="A butterfly lands on Pip's bulb and he sneezes"><br>**Butterfly**: it lands on his bulb, eyes cross, a big sneeze |
 | <img src="docs/media/acts/rain.svg" width="100%" alt="Rain, an umbrella and a puddle"><br>**Rain**: first drop on the bulb, umbrella opens in steps, puddle hop | <img src="docs/media/acts/night.svg" width="100%" alt="Night falls and Pip sleeps"><br>**Night**: stars appear one by one, a yawn, "z Z z", morning stretch |
 | <img src="docs/media/acts/typing.svg" width="100%" alt="Pip typing on a laptop"><br>**Working**: typing, thinking, a progress bar, "✓", what a tool call looks like | <img src="docs/media/acts/oops.svg" width="100%" alt="Pip trips and falls"><br>**Oops**: trips, falls flat with x_x eyes, dizzy stars, gets back up |

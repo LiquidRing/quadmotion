@@ -18,3 +18,13 @@ for (const id of Object.keys(ACTS)) {
     assert.equal(typeof ACTS[id].run, "function", "run(w) for the playground");
   });
 }
+
+test("speech follows the world language", async () => {
+  const { World } = await import("../src/stage/world.mjs");
+  const ru = new World({ lang: "ru" });
+  ru.say("Hi!");
+  assert.equal(ru.overlays[0].text, "‹Привет!›");
+  const en = new World();
+  en.say("Hi!");
+  assert.equal(en.overlays[0].text, "‹Hi!›");
+});

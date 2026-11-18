@@ -17,7 +17,9 @@ export async function playInTerminal({ input = process.stdin, output = process.s
   }
   const caps = await detectCapabilitiesAsync();
   const cols = Math.max(40, Math.min(80, (output.columns ?? 80) - 2));
-  const live = createLive({ cols: cols - (cols % 2), rows: 12 });
+  // Speech follows the user's locale (QUADMOTION_LANG overrides): ru or en.
+  const locale = (process.env.QUADMOTION_LANG ?? process.env.LC_ALL ?? process.env.LANG ?? "").toLowerCase();
+  const live = createLive({ cols: cols - (cols % 2), rows: 12, lang: locale.startsWith("ru") ? "ru" : "en" });
   const ids = Object.keys(ACTS);
   let page = 0;
   let walking = 0;

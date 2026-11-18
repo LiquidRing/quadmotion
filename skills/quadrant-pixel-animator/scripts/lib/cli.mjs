@@ -207,7 +207,7 @@ switch (command) {
     const { buildActs } = await import("./stage/index.mjs");
     const { ACTS } = await import("./stage/acts.mjs");
     const actIds = values.scene ? values.scene.split(",").filter((n) => ACTS[n]) : Object.keys(ACTS);
-    const shows = [...(values.scene ? [] : buildScenes(["logo"])), ...buildActs(actIds), ...buildScenes(order.filter((n) => SCENES[n] && (values.scene || n !== "logo"))), ...(values.scene ? [] : buildCast())];
+    const shows = [...(values.scene ? [] : buildScenes(["logo"])), ...buildActs(actIds, { lang: (process.env.QUADMOTION_LANG ?? process.env.LANG ?? "").toLowerCase().startsWith("ru") ? "ru" : "en" }), ...buildScenes(order.filter((n) => SCENES[n] && (values.scene || n !== "logo"))), ...(values.scene ? [] : buildCast())];
     const dim = (s) => (caps.noColor || !caps.isTTY ? s : `\x1b[2m${s}\x1b[0m`);
     for (const show of shows) {
       const tlName = show.rig.defaultTimeline;

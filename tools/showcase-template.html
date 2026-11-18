@@ -147,6 +147,9 @@ footer { padding-block: 26px 40px; border-top: 1px solid var(--line); color: var
           <span class="ctl"><kbd>click Pip</kbd> react</span>
           <span class="ctl"><kbd>click ground</kbd> walk there</span>
           <span class="ctl"><kbd>← →</kbd> walk · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump</span>
+          <label class="ctl" for="live-lang">speech
+            <select id="live-lang"><option value="en">English</option><option value="ru">Русский</option></select>
+          </label>
           <label class="ctl" for="live-render">render
             <select id="live-render"><option value="pixels">pixels</option><option value="glyphs">real glyphs</option></select>
           </label>
@@ -484,6 +487,7 @@ function keyHandler(down) {
 liveCanvas.addEventListener("keydown", keyHandler(true));
 liveCanvas.addEventListener("keyup", keyHandler(false));
 document.getElementById("live-render").onchange = (e) => { liveRender = e.target.value; drawLive(); };
+document.getElementById("live-lang").onchange = (e) => { live.setLang(e.target.value); liveCanvas.focus({ preventScroll: true }); };
 {
   const box = document.getElementById("act-groups");
   const LABEL = { basics: "Basics", play: "Play", weather: "Weather & time", work: "Work & feelings" };
