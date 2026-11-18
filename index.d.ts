@@ -93,9 +93,7 @@ export interface CompiledRig {
 
 export const QUADRANT_GLYPHS: readonly string[];
 export const GLYPH_TO_MASK: Readonly<Record<string, number>>;
-export const SHADES: readonly string[];
 export function charWidth(codePoint: number): 0 | 1 | 2;
-export function stringWidth(text: string): number;
 
 export class RigError extends Error {
   issues: Issue[];
@@ -173,3 +171,87 @@ export declare class Canvas {
   blit(grid: PixelGrid, x: number, y: number, opts?: { remap?: Record<string, TokenKey | null>; flipX?: boolean }): void;
   static sprite(rows: string[]): PixelGrid;
 }
+
+// ---- Pip and the stage (src/stage) ----
+export interface PipState {
+  body?: "s2" | "s1" | "n" | "b" | "t1" | "t2" | string;
+  legLen?: number;
+  y?: number;
+  eyes?: string;
+  look?: number;
+  lookY?: number;
+  mouth?: string | null;
+  blush?: boolean;
+  armL?: string;
+  armR?: string;
+  antenna?: number;
+  bulb?: "on" | "off" | "glow";
+}
+export type Action = (pip: Pip, world: World, ...args: any[]) => Generator<void, void, unknown>;
+export declare class Pip {
+  x: number;
+  facing: 1 | -1;
+  state: Required<PipState>;
+  readonly busy: boolean;
+  do(action: Action, ...args: any[]): this;
+  interrupt(action: Action, ...args: any[]): this;
+}
+export declare class World {
+  constructor(opts?: { cols?: number; rows?: number; seed?: number; groundRow?: number });
+  cols: number;
+  rows: number;
+  W: number;
+  H: number;
+  ground: number;
+  t: number;
+  pip: Pip;
+  props: { kind: string; x: number; step?(w: World): void; draw(c: Canvas, w: World): void; dead?: boolean; layer?: string }[];
+  rand(): number;
+  step(): void;
+  render(): { canvas: Canvas; overlays: Overlay[] };
+  dust(x: number, strength?: number): void;
+  spray(x: number, y: number, n: number, opts?: object): void;
+  say(text: string, ticks?: number, opts?: object): void;
+  mark(text: string, ticks: number, opts?: object): void;
+}
+export interface Act {
+  title: string;
+  description: string;
+  ticks: number;
+  setup?(w: World): void;
+  at?: Record<number, (w: World) => void>;
+  run(w: World): void;
+}
+export const TICK_MS: number;
+export const NEUTRAL: Readonly<Required<PipState>>;
+export const walkTo: Action;
+export const jump: Action;
+export const wave: Action;
+export const spin: Action;
+export const lookAround: Action;
+export const settle: Action;
+export const pose: Action;
+export const wait: Action;
+export function drawPip(c: Canvas, state: PipState & { x: number; ground: number; facing?: 1 | -1 }): object;
+export const EYES: Record<string, string[]>;
+export const MOUTHS: Record<string, string[]>;
+export const ARMS: Record<string, [number, number][]>;
+export const BODY_SIZES: Record<string, [number, number]>;
+export const PIP_PALETTE: Record<string, object>;
+export const STAGE_PALETTE: Record<string, object>;
+export const ACTS: Record<string, Act>;
+export const GROUPS: Record<string, { ACTS: Record<string, Act>; PALETTE: Record<string, object> }>;
+export function buildActs(ids?: string[]): CompiledScene[];
+export function recordAct(act: Act & { id: string }): CompiledScene;
+export function checkAct(scene: CompiledScene): { code: string; tick: number; message: string }[];
+export function createLive(opts?: { seed?: number; cols?: number; rows?: number }): {
+  readonly world: World;
+  TICK_MS: number;
+  step(): void;
+  frame(): CompiledFrame;
+  poke(): boolean;
+  goto(x: number): void;
+  walkHeld(dir: 1 | -1, held: () => boolean, run?: boolean): void;
+  jump(dir?: number): void;
+  play(id: string): void;
+};

@@ -1,0 +1,14 @@
+{
+  "name": "quadmotion",
+  "description": "QuadMotion: draw and animate terminal mascots in Unicode quadrant pixel art.",
+  "owner": {
+    "name": "LiquidRing"
+  },
+  "plugins": [
+    {
+      "name": "quadmotion",
+      "source": "./",
+      "description": "The quadrant-pixel-animator skill: terminal mascots and flicker-free Unicode animation."
+    }
+  ]
+}

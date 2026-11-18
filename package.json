@@ -1,6 +1,6 @@
 {
   "name": "quadmotion",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "2x2 Unicode quadrant pixel-art compiler and flicker-free terminal animation engine (DEC Mode 2026, Ink, Claude Code mods, SVG SMIL).",
   "type": "module",
   "license": "MIT",
@@ -17,7 +17,8 @@
     },
     "./ink": "./src/adapters/ink-widget.mjs",
     "./svg": "./src/adapters/svg-smil.mjs",
-    "./scenes": "./src/scenes/index.mjs"
+    "./scenes": "./src/scenes/index.mjs",
+    "./stage": "./src/stage/index.mjs"
   },
   "files": [
     "src",

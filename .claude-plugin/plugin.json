@@ -1,0 +1,8 @@
+{
+  "name": "quadmotion",
+  "version": "0.2.0",
+  "description": "Quadrant pixel-art and flicker-free terminal animation: the quadrant-pixel-animator skill for drawing, validating and compiling terminal mascots.",
+  "author": { "name": "LiquidRing" },
+  "license": "MIT",
+  "keywords": ["terminal", "pixel-art", "animation", "unicode", "mascot", "skill"]
+}

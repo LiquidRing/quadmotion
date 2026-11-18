@@ -12,7 +12,6 @@ const ANSI16 = [
   [90, [102, 102, 102]], [91, [241, 76, 76]], [92, [35, 209, 139]], [93, [245, 245, 67]],
   [94, [59, 142, 234]], [95, [214, 112, 214]], [96, [41, 184, 219]], [97, [255, 255, 255]],
 ];
-export const ANSI16_RGB = Object.fromEntries(ANSI16.map(([c, rgb]) => [c, rgb]));
 
 /** Nearest 16-color SGR foreground code for an RGB color. */
 export function autoAnsi(rgb) {
@@ -41,10 +40,6 @@ export function palette(spec) {
 export function hexToRgb(hex) {
   const h = hex.replace("#", "");
   return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
-}
-
-export function lerpRgb(a, b, t) {
-  return a.map((v, i) => Math.round(v + (b[i] - v) * t));
 }
 
 /** HSV (h in degrees) to RGB. */

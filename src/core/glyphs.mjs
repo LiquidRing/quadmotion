@@ -18,9 +18,6 @@ export const GLYPH_TO_MASK = Object.freeze(
   Object.fromEntries(QUADRANT_GLYPHS.map((g, i) => [g, i])),
 );
 
-/** Halftone shades for trails, from faint to dense. */
-export const SHADES = Object.freeze(["░", "▒", "▓"]); // ░ ▒ ▓
-
 // East Asian Wide / Fullwidth ranges plus common emoji blocks. Good enough for
 // callouts next to a sprite; not a full wcwidth implementation.
 const WIDE_RANGES = [
@@ -43,9 +40,3 @@ export function charWidth(cp) {
   return 1;
 }
 
-/** Terminal column width of a string. */
-export function stringWidth(text) {
-  let w = 0;
-  for (const ch of text) w += charWidth(ch.codePointAt(0));
-  return w;
-}

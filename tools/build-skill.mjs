@@ -26,6 +26,7 @@ const wrappers = {
   "preview.mjs": "preview",
   "inspect.mjs": "inspect",
   "show.mjs": "show",
+  "strip.mjs": "strip",
 };
 for (const [file, command] of Object.entries(wrappers)) {
   writeFileSync(

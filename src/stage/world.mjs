@@ -1,5 +1,6 @@
-// A tiny deterministic world for Pip: ground, props, particles, weather and
-// a behaviour queue. Actions are generator functions that change Pip's pose
+// A tiny deterministic world for Pip: ground, props, particles, overlays and
+// a behaviour queue. Weather, night and other conditions are props that act
+// groups bring with them (see acts/weather.mjs). Actions are generator functions that change Pip's pose
 // one tick at a time; the same code drives the browser playground (live
 // input) and the recorded scenes (scripted input).
 //
@@ -40,7 +41,6 @@ export class World {
     this.props = [];
     this.particles = [];
     this.overlays = []; // { text, col, row, fg, until }
-    this.env = { night: false, rain: 0, stars: [] };
     this.pip = new Pip(this, { x: Math.round(this.W / 4 / 2) * 2 });
     this.listeners = [];
   }
@@ -68,11 +68,6 @@ export class World {
       q.life--;
     }
     this.particles = this.particles.filter((q) => q.life > 0 && q.x > -4 && q.x < this.W + 4 && q.y < this.H + 2);
-    if (this.env.rain > 0) {
-      for (let i = 0; i < this.env.rain; i++) {
-        this.particles.push({ x: this.rand() * (this.W + 20) - 10, y: -1, vx: -0.35, vy: 1.6, g: 0, life: 40, tok: "r", splash: true });
-      }
-    }
     this.overlays = this.overlays.filter((o) => o.until > this.t);
     for (const fn of this.listeners) fn(this);
   }
@@ -113,12 +108,6 @@ export class World {
 
   render() {
     const c = new Canvas(this.W, this.H);
-    // sky
-    for (const s of this.env.stars) {
-      const tw = (this.t + s.phase) % s.period < 2;
-      if (this.env.night && !tw) c.set(s.x, s.y, s.big ? "S" : "s");
-    }
-    if (this.env.night) c.ellipse(this.W - 14, 3, 3, 1.6, "M");
     // ground
     for (let x = 0; x < this.W; x++) {
       c.set(x, this.ground, "G");
@@ -229,13 +218,6 @@ export function* pose(pip, w, patch, n = 1) {
   Object.assign(pip.state, patch);
   for (let i = 0; i < n; i++) yield;
 }
-
-export const ease = {
-  line: (t) => t,
-  out: (t) => 1 - (1 - t) ** 3,
-  in: (t) => t ** 3,
-  inOut: (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2),
-};
 
 /** Back to neutral, keeping the bulb, with a 1-tick settle. */
 export function* settle(pip, w, n = 2) {
@@ -401,7 +383,3 @@ export function* spin(pip, w) {
   yield* settle(pip, w);
 }
 
-/** Hop in place twice (Clawd's JUMP_WAVE beat). */
-export function* hop(pip, w, { times = 2 } = {}) {
-  for (let i = 0; i < times; i++) yield* jump(pip, w, { height: 4, ticks: 6 });
-}

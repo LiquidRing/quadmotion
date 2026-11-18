@@ -27,6 +27,8 @@ Commands
   inspect    Print sub-pixel grids split into 2x2 cells beside the glyphs.
   demo       Play the showcase here: title, every Pip act, engine demos, rigs.
              [--scene act-or-scene,...] [--seconds N]
+  strip      Render consecutive frames to a PNG to judge motion:
+             --input rig.json | --act ID | --scene NAME  [--from N --count N --crop pip]
   play       Pip live in this terminal: ←/→ walk, Shift run, Space jump,
              Enter poke, 1-9 acts, q quit.
   caps       Print detected terminal capabilities.
@@ -80,6 +82,7 @@ const { values } = parseArgs({
     seconds: { type: "string" },
   },
   allowPositionals: true,
+  strict: command !== "strip", // strip parses its own options
 });
 
 switch (command) {
@@ -227,6 +230,15 @@ switch (command) {
         }
       }
       console.log("");
+    }
+    break;
+  }
+  case "strip": {
+    const { runStrip } = await import("./strip.mjs");
+    try {
+      console.log(await runStrip(rest));
+    } catch (err) {
+      fail(err.message);
     }
     break;
   }

@@ -44,7 +44,8 @@ function drawPanel(t) {
   const a = (t / 48) * Math.PI * 2;
   c.ellipse(cx, cy, 11, 5.5, "r");
   c.ellipse(cx, cy, 9, 4.5, null);
-  c.line(cx, cy, cx + Math.cos(-a * 0.25) * 8, cy + Math.sin(-a * 0.25) * 4, "h");
+  // the hand always points at the orbiting ball
+  c.line(cx, cy, cx + Math.cos(a) * 7, cy + Math.sin(a) * 3.5, "h");
   c.ellipse(cx + Math.cos(a) * 10, cy + Math.sin(a) * 5, 2.2, 1.2, "b");
   c.set(cx, cy, "h");
   return c;

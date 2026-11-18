@@ -13,8 +13,6 @@ import { Crate } from "../props.mjs";
 
 const at = (entries) => Object.fromEntries(entries);
 const snap = (x) => Math.round(x / 2) * 2;
-/** Clamp a target x so Pip (about 28 wide) stays on stage. */
-export const onStage = (w, x) => Math.max(16, Math.min(w.W - 16, snap(x)));
 
 /** Clawd's jump beat: crouch + dust, arms up, land; twice. */
 export function* happyHops(pip, w, { times = 2 } = {}) {

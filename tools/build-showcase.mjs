@@ -93,7 +93,8 @@ if (artifactOut) {
 const media = join(root, "docs", "media");
 mkdirSync(media, { recursive: true });
 mkdirSync(join(media, "acts"), { recursive: true });
-for (const s of [...acts, ...scenes, ...cast]) {
+// README uses every act, the resolution comparison and the rigs.
+for (const s of [...acts, ...scenes.filter((x) => x.rig.name === "resolution"), ...cast]) {
   const svg = generateSvg(s, { timeline: s.rig.defaultTimeline, scale: s.rig.cols > 30 ? 8 : 12, background: "#0e1016" });
   const file = acts.includes(s) ? join(media, "acts", `${s.rig.name}.svg`) : join(media, `${s.rig.name}.svg`);
   writeFileSync(file, svg);
