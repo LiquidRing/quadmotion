@@ -30,8 +30,8 @@ Paths below are relative to this skill's folder (`scripts/`, `assets/`, `referen
 - Judge motion only from rendered frames (`scripts/strip.mjs`), never from
   reading the rig. Reading pixel rows does not show you floating feet, sliding,
   popping or a flat jump; the PNG does.
-- Create original characters unless the user supplies artwork. Do not
-  reproduce trademarked mascots (for example Anthropic's Clawd) or their colors.
+- Draw whatever character the user asks for. When the user supplies artwork
+  or a reference image, use it as the basis for the character design.
 
 ## Workflow
 
