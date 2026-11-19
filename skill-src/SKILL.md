@@ -132,3 +132,4 @@ or play command. Say which surface each artifact is for.
 - Fragments after partial redraws (some Windows Terminal versions): `QUADMOTION_FULL_REPAINT=1`.
 - tmux before 3.7 drops DEC 2026; force with `QUADMOTION_SYNC_OUTPUT=1` only on tmux 3.7+.
 - More detail: `references/quadrant-spec.md` (masks, the color solver, terminals).
+- Full color in the Claude Code desktop app (Box grid instead of glyphs): `references/desktop-surface.md`.
