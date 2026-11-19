@@ -19,6 +19,32 @@ function rgbDistance(a, b) {
   return 2 * dr * dr + 4 * dg * dg + 3 * db * db;
 }
 
+// Transparency against a color costs about as much as a mid-grey difference.
+const T_COST = 2 * 128 ** 2 + 4 * 128 ** 2 + 3 * 128 ** 2;
+function cost(a, b, palette) {
+  if (a === b) return 0;
+  if (a === T || b === T || !palette[a] || !palette[b]) return T_COST;
+  return rgbDistance(palette[a].rgb, palette[b].rgb);
+}
+
+/** The pair of colors that represents the 4 sub-pixels with the least error. */
+function bestPair(sub, keys, palette) {
+  let best = null;
+  let bestErr = Infinity;
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = i + 1; j < keys.length; j++) {
+      const a = keys[i];
+      const b = keys[j];
+      const err = sub.reduce((e, k) => e + Math.min(cost(k, a, palette), cost(k, b, palette)), 0);
+      if (err < bestErr) {
+        bestErr = err;
+        best = [a, b];
+      }
+    }
+  }
+  return best;
+}
+
 /**
  * Compile a pixel grid (2x resolution, tokens or null) into terminal cells.
  *
@@ -28,7 +54,10 @@ function rgbDistance(a, b) {
  *  - of two opaque colors the more frequent one is the foreground, ties broken
  *    by palette order, so a body cell with one eye pixel compiles to ▛ / ▜
  *    (body foreground, eye background) instead of an inverted ▗;
- *  - a third or fourth color is folded into the nearest kept color and reported.
+ *  - a cell with 3-4 colors keeps the pair that loses the least color (every
+ *    pair is tried; transparency costs like a mid-grey difference) and maps the
+ *    other sub-pixels to the nearer kept color. This is a terminal limit, not an
+ *    authoring rule: author in full color and look at the result with strip.
  *
  * @returns {{ cols:number, rows:number, cells:Array<Array<{glyph:string,mask:number,fg:string|null,bg:string|null,wide?:boolean,skip?:boolean}>>, warnings:Array }}
  */
@@ -61,6 +90,7 @@ export function compileGridToFrame(grid, palette, opts = {}) {
       const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1] || priority(a[0]) - priority(b[0]));
 
       let kept = ranked.slice(0, 2).map(([k]) => k);
+      if (ranked.length > 2) kept = bestPair(sub, ranked.map(([k]) => k), palette);
       if (ranked.length > 2) {
         warnings.push({
           code: "cell-colors",
@@ -68,7 +98,7 @@ export function compileGridToFrame(grid, palette, opts = {}) {
           row: r,
           subpixel: { x: px, y: py },
           colorsFound: ranked.map(([k]) => (k === T ? "transparent" : k)),
-          message: `Cell (${c},${r}) [sub-pixels x=${px}..${px + 1}, y=${py}..${py + 1}] has ${ranked.length} colors (${ranked.map(([k]) => (k === T ? "transparent" : k)).join(", ")}); folded to 2. Move a boundary sub-pixel by 1 instead.`,
+          message: `Cell (${c},${r}) [sub-pixels x=${px}..${px + 1}, y=${py}..${py + 1}] has ${ranked.length} colors (${ranked.map(([k]) => (k === T ? "transparent" : k)).join(", ")}); the terminal shows the closest 2.`,
         });
       }
 
@@ -81,21 +111,16 @@ export function compileGridToFrame(grid, palette, opts = {}) {
         fg = kept.find((k) => k !== T);
         bg = null;
       } else {
-        // Both opaque: ranked order already puts majority (then palette order) first.
-        fg = kept[0];
-        bg = kept[1];
+        // Both opaque: the majority (then palette order) is the foreground.
+        const n = (k) => counts.get(k) ?? 0;
+        [fg, bg] = n(kept[1]) > n(kept[0]) || (n(kept[1]) === n(kept[0]) && priority(kept[1]) < priority(kept[0])) ? [kept[1], kept[0]] : kept;
       }
 
       const resolveKey = (k) => {
         if (k === fg) return "fg";
         if (bg !== null ? k === bg : k === T) return "bg";
-        // Third/fourth color: fold into the nearest kept color.
-        if (k === T) return bg === null ? "bg" : "bg";
-        if (bg === null) return "fg"; // only one opaque kept: opaque wins
-        const tok = palette[k];
-        const dFg = rgbDistance(tok.rgb, palette[fg].rgb);
-        const dBg = rgbDistance(tok.rgb, palette[bg].rgb);
-        return dFg <= dBg ? "fg" : "bg";
+        // Third/fourth color: the nearer kept color (same cost as bestPair).
+        return cost(k, fg, palette) <= cost(k, bg ?? T, palette) ? "fg" : "bg";
       };
 
       let mask = 0;

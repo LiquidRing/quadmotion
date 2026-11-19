@@ -14,6 +14,7 @@ cpSync(join(root, "skill-src"), out, { recursive: true });
 cpSync(join(root, "src"), join(out, "scripts", "lib"), { recursive: true });
 mkdirSync(join(out, "assets"), { recursive: true });
 cpSync(join(root, "assets", "pip.rig.json"), join(out, "assets", "starter-companion.rig.json"));
+cpSync(join(root, "assets", "characters"), join(out, "assets", "characters"), { recursive: true });
 cpSync(join(root, "schema", "rig.schema.json"), join(out, "assets", "rig.schema.json"));
 // The starter rig points at the schema next to it inside the skill.
 const starter = join(out, "assets", "starter-companion.rig.json");

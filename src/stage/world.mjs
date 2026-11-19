@@ -31,8 +31,10 @@ export const NEUTRAL = Object.freeze({
 });
 
 export class World {
-  constructor({ cols = 64, rows = 12, seed = 1, groundRow, lang = "en" } = {}) {
+  constructor({ cols = 64, rows = 12, seed = 1, groundRow, lang = "en", character = null } = {}) {
     this.lang = lang;
+    // character: { draw(canvas, state) } from a character module; Pip by default.
+    this.character = character;
     this.cols = cols;
     this.rows = rows;
     this.W = cols * 2;
@@ -205,7 +207,8 @@ export class Pip {
   }
 
   draw(c) {
-    this.box = drawPip(c, { ...this.state, x: this.x, ground: this.w.ground, facing: this.facing, feet: this.feet ?? undefined });
+    const draw = this.w.character?.draw ?? drawPip;
+    this.box = draw(c, { ...this.state, x: this.x, ground: this.w.ground, facing: this.facing, feet: this.feet ?? undefined });
   }
 }
 

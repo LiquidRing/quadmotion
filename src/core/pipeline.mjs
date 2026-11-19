@@ -24,6 +24,7 @@ export function compileRig(rawOrRig) {
   const poses = {};
   for (const [name, grid] of Object.entries(rig.poses)) {
     const frame = compileGridToFrame(grid, rig.palette);
+    frame.grid = grid;
     warnings.push(...frame.warnings.map((w) => ({ ...w, where: `poses.${name}` })));
     poses[name] = frame;
   }
@@ -38,6 +39,7 @@ export function compileRig(rawOrRig) {
         const where = `timelines.${name}.frames[${i}]`;
         const frame = compileTimelineFrame(rig, f, where, sink);
         warnings.push(...frame.warnings.map((w) => ({ ...w, where })));
+        frame.grid = rig.frameGrid(f); // full-color source, for strip --view and svg --source
         return { pose: f.pose, hold: f.hold, durationMs: f.hold * tl.tickMs, frame };
       }),
     };

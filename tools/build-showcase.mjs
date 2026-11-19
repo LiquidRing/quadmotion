@@ -97,6 +97,15 @@ mkdirSync(join(media, "acts", "ru"), { recursive: true });
 for (const s of buildActs(undefined, { lang: "ru" })) {
   writeFileSync(join(media, "acts", "ru", `${s.rig.name}.svg`), generateSvg(s, { timeline: s.rig.defaultTimeline, scale: 8, background: "#0e1016" }));
 }
+// Ember, the full-color character module example, in full color.
+{
+  const { loadCharacter } = await import("../src/stage/character.mjs");
+  const ember = await loadCharacter(join(root, "assets", "characters", "ember.mjs"));
+  mkdirSync(join(media, "ember"), { recursive: true });
+  for (const s of buildActs(["walk-jump"], { character: ember })) {
+    writeFileSync(join(media, "ember", `${s.rig.name}.svg`), generateSvg(s, { timeline: "main", scale: 8, background: "#0e1016", source: true }));
+  }
+}
 // README uses every act, the resolution comparison and the rigs.
 for (const s of [...acts, ...scenes.filter((x) => x.rig.name === "resolution"), ...cast]) {
   const svg = generateSvg(s, { timeline: s.rig.defaultTimeline, scale: s.rig.cols > 30 ? 8 : 12, background: "#0e1016" });

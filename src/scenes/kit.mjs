@@ -111,6 +111,29 @@ export class Canvas {
       }
     }
   }
+  /**
+   * Paint tok on every empty pixel that touches a filled one: a 1-sub-pixel
+   * contour around everything drawn so far. corners: also diagonal neighbours.
+   */
+  outline(tok, { corners = false } = {}) {
+    const n = corners ? [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]] : [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    const add = [];
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        if (!this.px[y][x] && n.some(([dx, dy]) => this.get(x + dx, y + dy))) add.push([x, y]);
+      }
+    }
+    for (const [x, y] of add) this.px[y][x] = tok;
+    return this;
+  }
+  /** Recolor pixels of token from whose neighbour on side is empty: a rim of shade or light. */
+  rim(from, to, side = "bottom") {
+    const [dx, dy] = { bottom: [0, 1], top: [0, -1], left: [-1, 0], right: [1, 0] }[side];
+    const hit = [];
+    for (let y = 0; y < this.height; y++) for (let x = 0; x < this.width; x++) if (this.px[y][x] === from && !this.get(x + dx, y + dy)) hit.push([x, y]);
+    for (const [x, y] of hit) this.px[y][x] = to;
+    return this;
+  }
   /** Parse ASCII rows ('.' = empty) into a grid usable with blit. */
   static sprite(rows) {
     return rows.map((r) => [...r].map((c) => (c === "." || c === " " ? null : c)));
@@ -130,6 +153,7 @@ export function makeScene({ name, title, description, cols, rows, palette: pal, 
     const base = compileGridToFrame(f.canvas.px, p);
     folded += base.warnings.length;
     const frame = applyOverlays(base, f.overlays ?? [], p);
+    frame.grid = f.canvas.px;
     return { pose: "frame", hold: f.hold ?? 1, durationMs: (f.hold ?? 1) * tickMs, frame, folds: base.warnings };
   });
   const rig = {

@@ -1,7 +1,7 @@
 // Recorded mascot acts: run the world with a script, capture every tick, and
 // compile the frames like any other scene (player, SVG, showcase, checks).
 
-import { makeScene, palette } from "../scenes/kit.mjs";
+import { makeScene, palette, Canvas } from "../scenes/kit.mjs";
 import { PIP_PALETTE } from "./pip.mjs";
 import { World, TICK_MS } from "./world.mjs";
 import { ACTS, GROUP_PALETTE } from "./acts.mjs";
@@ -37,9 +37,13 @@ export const STAGE_PALETTE = {
   h: { name: "confetti-3", rgb: [255, 107, 139], ansi16: 91 },
 };
 
-/** Run an act script and record every tick. */
-export function recordAct(act, { lang = "en" } = {}) {
-  const world = new World({ cols: act.cols ?? 64, rows: act.rows ?? 12, seed: act.seed ?? 7, lang });
+/**
+ * Run an act script and record every tick.
+ * character: a character module ({ name, palette, draw }) to play the act
+ * instead of Pip (see src/stage/character.mjs).
+ */
+export function recordAct(act, { lang = "en", character = null } = {}) {
+  const world = new World({ cols: act.cols ?? character?.cols ?? 64, rows: act.rows ?? character?.rows ?? 12, seed: act.seed ?? 7, lang, character });
   act.setup?.(world);
   const frames = [];
   const meta = [];
@@ -48,11 +52,12 @@ export function recordAct(act, { lang = "en" } = {}) {
     act.at?.[i]?.(world);
     world.step();
     frames.push(world.render());
-    const r = frames[frames.length - 1];
+    // contact: the character's own pixels (drawn alone) on the row above the ground
+    const solo = new Canvas(world.W, world.H);
+    world.pip.draw(solo);
     const box = world.pip.box;
-    // contact: body pixels on the row just above the ground under Pip
     let contact = 0;
-    if (box) for (let x = box.left - 4; x <= box.right + 4; x++) if (r.canvas.get(x, world.ground - 1) === "#") contact++;
+    if (box) for (let x = box.left - 4; x <= box.right + 4; x++) if (solo.get(x, world.ground - 1)) contact++;
     meta.push({ pip: { x: world.pip.x, box, state: { ...world.pip.state }, feet: box?.feet, contact, allowJump: Boolean(world.pip.teleport) } });
     world.pip.teleport = false;
   }
@@ -62,7 +67,7 @@ export function recordAct(act, { lang = "en" } = {}) {
     description: act.description,
     cols: world.cols,
     rows: world.rows,
-    palette: palette({ ...STAGE_PALETTE, ...GROUP_PALETTE }),
+    palette: palette({ ...STAGE_PALETTE, ...GROUP_PALETTE, ...(character?.palette ?? {}) }),
     tickMs: TICK_MS,
     loop: true,
     frames,
@@ -73,10 +78,11 @@ export function recordAct(act, { lang = "en" } = {}) {
   return scene;
 }
 
-export function buildActs(ids = Object.keys(ACTS), { lang = "en" } = {}) {
-  return ids.map((id) => {
-    const act = ACTS[id];
-    if (!act) throw new Error(`Unknown act "${id}". Known: ${Object.keys(ACTS).join(", ")}`);
-    return recordAct({ id, ...act }, { lang });
+export function buildActs(ids, { lang = "en", character = null } = {}) {
+  const acts = { ...ACTS, ...(character?.acts ?? {}) };
+  return (ids ?? Object.keys(ACTS)).map((id) => {
+    const act = acts[id];
+    if (!act) throw new Error(`Unknown act "${id}". Known: ${Object.keys(acts).join(", ")}`);
+    return recordAct({ id, ...act }, { lang, character });
   });
 }

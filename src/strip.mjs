@@ -3,8 +3,10 @@
 //
 //   quadmotion strip --input rig.json [--timeline idle]
 //   quadmotion strip --act walk-jump [--crop pip --width 24]
+//   quadmotion strip --module my-character.mjs --act walk-jump --view compare
 //   quadmotion strip --scene physics
 // Options: --from 0 --count 24 --every 1 --columns 4 --cw 6 --crop c0,c1 --out file.png
+//          --view terminal|source|compare (compare: full-color source beside the terminal result)
 // Default output: ./records/<name>-<timeline>-<from>.png (path printed).
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -12,6 +14,7 @@ import { parseArgs } from "node:util";
 import { join, dirname, resolve } from "node:path";
 import { compileRig } from "./core/pipeline.mjs";
 import { stripPng } from "./core/png.mjs";
+import { fidelity } from "./stage/check.mjs";
 
 export async function runStrip(args) {
   const { values } = parseArgs({
@@ -29,12 +32,18 @@ export async function runStrip(args) {
       out: { type: "string" },
       crop: { type: "string" }, // "c0,c1" cell columns, or "pip" to follow Pip (acts)
       width: { type: "string", default: "24" },
+      view: { type: "string", default: "terminal" }, // terminal | source | compare
+      module: { type: "string" }, // a character module playing --act (src/stage/character.mjs)
     },
   });
 
   let compiled;
   if (values.scene) compiled = (await import("./scenes/index.mjs")).buildScenes([values.scene])[0];
-  else if (values.act) compiled = (await import("./stage/index.mjs")).buildActs([values.act])[0];
+  else if (values.act || values.module) {
+    const character = values.module ? await (await import("./stage/character.mjs")).loadCharacter(values.module) : null;
+    const id = values.act ?? Object.keys(character.acts)[0] ?? "walk-jump";
+    compiled = (await import("./stage/index.mjs")).buildActs([id], { character })[0];
+  }
   else if (values.input) compiled = compileRig(JSON.parse(readFileSync(values.input, "utf8")));
   else throw new Error("Pass --input rig.json, --act <id> or --scene <name>");
 
@@ -54,13 +63,16 @@ export async function runStrip(args) {
         c0 = Math.max(0, Math.min(compiled.rig.cols - 2 * half, cx - half));
         c1 = c0 + 2 * half;
       } else [c0, c1] = values.crop.split(",").map(Number);
-      f = { ...f, frame: { ...f.frame, cols: c1 - c0, cells: f.frame.cells.map((line) => line.slice(c0, c1)) } };
+      const grid = f.frame.grid?.map((row) => row.slice(c0 * 2, c1 * 2));
+      f = { ...f, frame: { ...f.frame, cols: c1 - c0, cells: f.frame.cells.map((line) => line.slice(c0, c1)), grid } };
     }
     frames.push(f);
   }
-  const png = stripPng(frames, compiled.rig.palette, { cw: Number(values.cw), columns: Number(values.columns) });
+  const png = stripPng(frames, compiled.rig.palette, { cw: Number(values.cw), columns: Number(values.columns), view: values.view });
   const out = resolve(values.out ?? join("records", `${compiled.rig.name}-${tlName}-${from}.png`));
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, png);
-  return `${out}  frames ${from}..${from + (frames.length - 1) * every} of ${tl.frames.length}`;
+  const fid = tl.frames.map((f) => fidelity(f.frame)).filter((v) => v !== null);
+  const avg = fid.length ? ` · terminal fidelity ${(100 * fid.reduce((a, b) => a + b, 0) / fid.length).toFixed(1)}% of colored sub-pixels` : "";
+  return `${out}  frames ${from}..${from + (frames.length - 1) * every} of ${tl.frames.length}${avg}`;
 }

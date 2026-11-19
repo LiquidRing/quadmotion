@@ -28,14 +28,18 @@ cell background (or nothing, when the background is transparent).
 ## Color resolution per cell
 
 1. Count tokens in the 2x2 cell (transparent counts).
-2. Keep the two most frequent tokens. On equal counts transparent is kept
-   first, then palette order decides.
+2. With 1 or 2 tokens nothing is lost. With 3 or 4, every pair is tried and
+   the pair with the least color error is kept (weighted RGB distance;
+   transparency against a color costs about a mid-grey difference). The
+   other sub-pixels take the nearer kept color.
 3. If transparent is kept, it is the background and nothing is painted behind
    the glyph. Otherwise the more frequent opaque token is the foreground (ties:
    palette order), so body + one eye pixel compiles to ▛ ▜ ▙ ▟ with the body as
    foreground and the eye as background.
-4. A third or fourth token is folded into the nearest kept color. The
-   validator reports it as an error with the cell and sub-pixel coordinates.
+4. Folding is reported (`cell-colors` warning, or an error with
+   `"cells": "strict"`); `strip --view compare` shows its cost and prints the
+   terminal fidelity. Full-color outputs (`svg --source`, `strip --view source`)
+   do not fold at all.
 
 ## Why 2x2 quadrants
 

@@ -124,14 +124,25 @@ export function drawFrame(raster, frame, palette, ox, oy, cw = 6, opts = {}) {
   }
 }
 
+/** Draw a full-color source grid (sub-pixels as cw/2 x cw rects, terminal aspect). */
+export function drawGrid(raster, grid, palette, ox, oy, cw = 6, opts = {}) {
+  cw = Math.max(2, Math.round(cw / 2) * 2);
+  const w = cw / 2;
+  if (opts.frameBg) raster.fill(ox, oy, (grid[0]?.length ?? 0) * w, grid.length * cw, opts.frameBg);
+  grid.forEach((row, y) => row.forEach((k, x) => k && palette[k] && raster.fill(ox + x * w, oy + y * cw, w, cw, palette[k].rgb)));
+}
+
 /**
  * Contact strip: frames laid out in a grid, left to right, top to bottom,
  * each with a thin colored bar on top whose length encodes its hold (ms).
+ * view: "terminal" (compiled cells), "source" (full-color grid) or "compare"
+ * (source and terminal side by side, to see what the 2-color cells cost).
  */
-export function stripPng(frames, palette, { cw = 6, columns = 4, gap = 6, marks = [] } = {}) {
+export function stripPng(frames, palette, { cw = 6, columns = 4, gap = 6, marks = [], view = "terminal" } = {}) {
   cw = Math.max(2, Math.round(cw / 2) * 2);
   const f0 = frames[0].frame;
-  const fw = f0.cols * cw;
+  const one = f0.cols * cw;
+  const fw = view === "compare" ? one * 2 + 4 : one;
   const fh = f0.rows * cw * 2;
   const rows = Math.ceil(frames.length / columns);
   const W = columns * (fw + gap) + gap;
@@ -142,7 +153,13 @@ export function stripPng(frames, palette, { cw = 6, columns = 4, gap = 6, marks 
     const y = gap + Math.floor(i / columns) * (fh + gap + 4);
     const holdPx = Math.min(fw, Math.round((f.durationMs / 1000) * fw));
     r.fill(x, y, holdPx, 2, marks.includes(i) ? [250, 204, 72] : [64, 192, 168]);
-    drawFrame(r, f.frame, palette, x, y + 4, cw, { frameBg: [8, 9, 13] });
+    const bg = { frameBg: [8, 9, 13] };
+    if (view !== "terminal" && !f.frame.grid) throw new Error("This frame has no source grid; use --view terminal.");
+    if (view === "source") drawGrid(r, f.frame.grid, palette, x, y + 4, cw, bg);
+    else if (view === "compare") {
+      drawGrid(r, f.frame.grid, palette, x, y + 4, cw, bg);
+      drawFrame(r, f.frame, palette, x + one + 4, y + 4, cw, bg);
+    } else drawFrame(r, f.frame, palette, x, y + 4, cw, bg);
   });
   return r.png();
 }

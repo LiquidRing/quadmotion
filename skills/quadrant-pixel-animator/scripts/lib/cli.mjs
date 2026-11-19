@@ -21,7 +21,8 @@ Commands
   validate   Check rig invariants (exit 1 on errors). --json for machine output.
   compile    --target ansi|json|ink|claude-mod|svg|text|all --out DIR
              [--timeline NAME] (svg: one timeline; default: every timeline)
-             [--square] (svg: square sub-pixels) [--mod-name NAME] [--tick-ms N]
+             [--square] (svg: square sub-pixels) [--source] (svg: full-color source,
+             not 2-color terminal cells) [--mod-name NAME] [--tick-ms N]
   preview    Play a timeline in this terminal. [--timeline NAME] [--loops N]
   show       Print every pose (or --pose NAME) once, colored.
   inspect    Print sub-pixel grids split into 2x2 cells beside the glyphs.
@@ -32,7 +33,8 @@ Commands
   play       Pip live in this terminal: ←/→ walk, Shift run, Space jump,
              Enter poke, 1-9 acts, q quit.
   caps       Print detected terminal capabilities.
-  (compile also takes --scene NAME instead of --input to export a procedural scene)
+  (compile and strip also take --scene NAME, or --act ID [--module character.mjs],
+   instead of --input: a procedural scene, or an act played by Pip or your character)
 `;
 
 function readRig(path) {
@@ -75,10 +77,13 @@ const { values } = parseArgs({
     pose: { type: "string" },
     loops: { type: "string" },
     square: { type: "boolean", default: false },
+    source: { type: "boolean", default: false },
     json: { type: "boolean", default: false },
     "mod-name": { type: "string" },
     "tick-ms": { type: "string" },
     scene: { type: "string" },
+    act: { type: "string" },
+    module: { type: "string" },
     seconds: { type: "string" },
   },
   allowPositionals: true,
@@ -101,7 +106,13 @@ switch (command) {
     break;
   }
   case "compile": {
-    const compiled = values.scene ? (await import("./scenes/index.mjs")).buildScenes([values.scene])[0] : compileOrExit(readRig(values.input));
+    let compiled;
+    if (values.scene) compiled = (await import("./scenes/index.mjs")).buildScenes([values.scene])[0];
+    else if (values.act || values.module) {
+      const character = values.module ? await (await import("./stage/character.mjs")).loadCharacter(values.module) : null;
+      const id = values.act ?? Object.keys(character.acts)[0] ?? "walk-jump";
+      compiled = (await import("./stage/index.mjs")).buildActs([id], { character })[0];
+    } else compiled = compileOrExit(readRig(values.input));
     for (const w of compiled.warnings) process.stderr.write(`warning: ${w.where ?? ""} ${w.message}\n`);
     const out = resolve(values.out);
     const name = compiled.rig.name;
@@ -130,7 +141,7 @@ switch (command) {
         }
         case "svg": {
           const names = values.timeline ? [values.timeline] : Object.keys(compiled.timelines);
-          for (const tl of names) write(join(out, "svg", `${name}.${tl}.svg`), generateSvg(compiled, { timeline: tl, square: values.square }));
+          for (const tl of names) write(join(out, "svg", `${name}.${tl}.svg`), generateSvg(compiled, { timeline: tl, square: values.square, source: values.source }));
           for (const pose of Object.keys(compiled.poses)) write(join(out, "svg", "poses", `${name}.${pose}.svg`), generatePoseSvg(compiled, pose, { square: values.square }));
           break;
         }

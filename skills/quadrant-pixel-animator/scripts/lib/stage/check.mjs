@@ -2,9 +2,10 @@
 //  - grounded: when Pip stands (y = 0) a foot touches the row above the ground
 //  - no foot slide: a foot that stays down between two ticks keeps its x
 //  - no teleport: Pip moves at most 8 sub-pixels per tick unless flagged
-//  - clean cells: no folded (3+ color) cell inside Pip's box
+//  - clean cells: no folded (3+ color) cell inside Pip's box (opts.folds;
+//    off for full-color characters, where folding is expected)
 
-export function checkAct(scene) {
+export function checkAct(scene, { folds: checkFolds = true } = {}) {
   const issues = [];
   const meta = scene.meta;
   const frames = scene.timelines.main.frames;
@@ -26,7 +27,30 @@ export function checkAct(scene) {
       }
     }
     const folds = (frames[i].folds ?? []).filter((w) => w.col * 2 + 1 >= m.box.left && w.col * 2 <= m.box.right && w.row * 2 + 1 >= m.box.top && w.row * 2 <= m.box.footY);
-    if (onScreen && folds.length) issues.push({ code: "pip-fold", tick: i, message: `tick ${i}: ${folds.length} cell(s) with 3+ colors on Pip` });
+    if (checkFolds && onScreen && folds.length) issues.push({ code: "pip-fold", tick: i, message: `tick ${i}: ${folds.length} cell(s) with 3+ colors on Pip` });
   }
   return issues;
+}
+
+/**
+ * Share of sub-pixels the terminal shows in their source color (0..1): how
+ * much the 2-colors-per-cell limit costs a frame.
+ */
+export function fidelity(frame) {
+  if (!frame.grid) return null;
+  let same = 0;
+  let total = 0;
+  frame.cells.forEach((line, r) =>
+    line.forEach((cell, c) => {
+      if (cell.mask < 0) return; // overlay text
+      for (let i = 0; i < 4; i++) {
+        const src = frame.grid[r * 2 + (i >> 1)][c * 2 + (i & 1)] ?? null;
+        const shown = (cell.mask >> i) & 1 ? cell.fg : cell.bg;
+        if (src === null && shown === null) continue; // empty stays empty
+        total++;
+        if (src === shown) same++;
+      }
+    }),
+  );
+  return total ? same / total : 1;
 }

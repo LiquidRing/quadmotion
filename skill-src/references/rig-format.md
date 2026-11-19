@@ -45,5 +45,6 @@ Schema: `assets/rig.schema.json`. Full example: `assets/starter-companion.rig.js
 
 Index sub-pixels from 0. Cell `(c, r)` covers columns `2c, 2c+1` and rows
 `2r, 2r+1`. A pixel at column 5 is the right half of cell 2; at column 6 the
-left half of cell 3. Plan eyes and edges so each cell holds at most two tokens.
+left half of cell 3. Cells with more than two tokens are folded for the
+terminal (see quadrant-spec.md); check the cost with `strip --view compare`.
 `node scripts/inspect.mjs` prints the grid already split into cells.

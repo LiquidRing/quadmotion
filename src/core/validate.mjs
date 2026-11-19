@@ -69,7 +69,9 @@ export function validateRig(raw, opts = {}) {
       const key = `${where}:${w.col}:${w.row}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      add("error", "cell-colors", `${where}: ${w.message}`, where);
+      // The terminal can show only 2 colors per cell; extra colors are folded
+      // by the compiler. A warning by default, an error with "cells": "strict".
+      add(raw.cells === "strict" ? "error" : "warning", "cell-colors", `${where}: ${w.message}`, where);
     }
   };
   for (const [name, grid] of Object.entries(rig.poses)) {

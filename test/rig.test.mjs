@@ -33,13 +33,16 @@ test("remap and layers compose poses", () => {
   assert.equal(rig.poses.blink[2][5], "#", "blink remaps eyes to body");
 });
 
-test("validator: more than 2 colors in a cell is an error with coordinates", () => {
+test("validator: more than 2 colors in a cell warns with coordinates, errors in strict mode", () => {
   const raw = clone(pip);
   raw.poses.default.pixels[0] = "........AE........"; // A, E, #, # in cell (4,0)
   const r = validateRig(raw);
-  const e = r.errors.find((x) => x.code === "cell-colors");
-  assert.ok(e, JSON.stringify(r.errors));
-  assert.match(e.message, /Cell \(4,0\)/);
+  assert.ok(r.ok);
+  const w = r.warnings.find((x) => x.code === "cell-colors");
+  assert.ok(w, JSON.stringify(r.warnings));
+  assert.match(w.message, /Cell \(4,0\)/);
+  raw.cells = "strict";
+  assert.ok(validateRig(raw).errors.some((x) => x.code === "cell-colors"));
 });
 
 test("validator: ragged rows, unknown tokens, unknown poses, bad holds, clipping", () => {

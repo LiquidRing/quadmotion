@@ -125,20 +125,40 @@ compiles it.
 
 ### What the skill does
 
-1. It draws poses as a pixel grid in JSON, never as glyphs.
-2. It inspects each pose split into 2×2 cells with `inspect`.
+1. It picks the surface and the resolution first: a 9×3 status-line mascot
+   and a detailed hero character need different sizes, and a terminal needs
+   different output from a web page.
+2. It draws in full color, with outlines, shading and highlights: either a
+   character module in code (the default for anything detailed) or a JSON rig
+   for small mascots. It never types glyphs.
 3. It renders consecutive frames to a PNG with `strip` and looks at them, three
-   rounds or more per timeline.
-4. It validates the rig with `validate`: an even grid, at most 2 colors per
-   cell, known poses, integer holds, a reduced-motion pose and loop seams.
+   rounds or more per action. `--view compare` puts the full-color source
+   beside the terminal result and prints how much color the terminal keeps.
+4. It checks the work: feet on the ground, no sliding, no teleports, rig
+   invariants.
 5. It compiles to:
    - a standalone ANSI player;
    - an Ink component;
    - a Claude Code mod with its own tests;
-   - SVG.
+   - SVG, as the terminal shows it or in full color (`--source`).
 
-The skill carries references for the acting grammar and timing, the quadrant
-spec, and the puppet method used for Pip.
+The skill carries the whole engine plus references for the character
+contract, the acting grammar and timing, and the quadrant spec.
+
+### Your own characters
+
+<img src="docs/media/ember/walk-jump.svg" width="100%" alt="Ember the fox walks and jumps a crate, drawn in full color with an outline and shading">
+
+A character module draws itself from a pose state; the stage supplies the
+world and all 19 acts. [Ember](assets/characters/ember.mjs) is the example:
+fur with a light crown and a shaded underside, a cream muzzle, eyes with
+highlights, dark socks, a 1-sub-pixel outline. Up to four colors meet in a
+2×2 cell; the terminal keeps the best two for each cell and about 96% of the
+colored sub-pixels stay true.
+
+```bash
+node src/cli.mjs strip --module assets/characters/ember.mjs --act walk-jump --view compare --crop pip --width 30
+```
 
 ## What QuadMotion can do
 

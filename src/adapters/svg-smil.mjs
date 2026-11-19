@@ -54,9 +54,26 @@ function frameShapes(frame, palette, px, py) {
   return out.join("");
 }
 
+/** Rects for a full-color source grid (no 2-color cells), runs merged per row. */
+function gridShapes(grid, palette, px, py) {
+  const out = [];
+  grid.forEach((row, y) => {
+    for (let x = 0; x < row.length; ) {
+      const k = row[x];
+      let w = 1;
+      while (x + w < row.length && row[x + w] === k) w++;
+      if (k && palette[k]) out.push(`<rect x="${x * px}" y="${y * py}" width="${w * px}" height="${py}" fill="${hex(palette[k])}"/>`);
+      x += w;
+    }
+  });
+  return out.join("");
+}
+
 /**
  * @param compiled  compileRig() result
- * @param opts { timeline?: name, square?: boolean, scale?: number, clockSync?: boolean }
+ * @param opts { timeline?, square?, scale?, clockSync?, background?,
+ *               source?: true draws the full-color source grid instead of the
+ *               2-color terminal cells (for web, desktop, docs) }
  */
 export function generateSvg(compiled, opts = {}) {
   const b = toBundle(compiled);
@@ -69,6 +86,9 @@ export function generateSvg(compiled, opts = {}) {
   const name = opts.timeline ?? b.rig.defaultTimeline;
   const tl = b.timelines[name];
   if (!tl) throw new Error(`Unknown timeline "${name}".`);
+  const full = compiled.timelines[name].frames;
+  const shapesOf = (bundleFrame, i) =>
+    opts.source && full[i]?.frame.grid ? gridShapes(full[i].frame.grid, palette, px, py) : frameShapes(bundleFrame, palette, px, py);
   const total = tl.frames.reduce((s, f) => s + f.durationMs, 0);
   const dur = `${(total / 1000).toFixed(3)}s`;
   const repeat = tl.loop ? `repeatCount="indefinite"` : `repeatCount="1" fill="freeze"`;
@@ -76,8 +96,8 @@ export function generateSvg(compiled, opts = {}) {
   // One group per distinct frame content, shown during its time slots.
   const groups = new Map(); // shapes -> [ [start,end], ... ]
   let t = 0;
-  for (const f of tl.frames) {
-    const shapes = frameShapes(f.frame, palette, px, py);
+  for (const [i, f] of tl.frames.entries()) {
+    const shapes = shapesOf(f.frame, i);
     if (!groups.has(shapes)) groups.set(shapes, []);
     groups.get(shapes).push([t / total, (t + f.durationMs) / total]);
     t += f.durationMs;
@@ -103,7 +123,8 @@ export function generateSvg(compiled, opts = {}) {
     return `<g class="qm-anim" visibility="${merged[0][1]}"><animate attributeName="visibility" dur="${dur}" calcMode="discrete" keyTimes="${keyTimes}" values="${values}" ${repeat}/>${shapes}</g>`;
   });
 
-  const still = frameShapes(b.poses[b.rig.reducedMotionPose], palette, px, py);
+  const stillPose = compiled.poses[b.rig.reducedMotionPose];
+  const still = opts.source && stillPose?.grid ? gridShapes(stillPose.grid, palette, px, py) : frameShapes(b.poses[b.rig.reducedMotionPose], palette, px, py);
   const sync = opts.clockSync !== false && tl.loop
     ? `<script><![CDATA[(function(){var s=document.documentElement;if(s.setCurrentTime){s.setCurrentTime((Date.now()%${total})/1000);}})();]]></script>`
     : "";
